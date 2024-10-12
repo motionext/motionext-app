@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+# Motionext App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Motionext is a comprehensive health and fitness application developed with React Native and Expo, designed to help users monitor and improve their overall health, fitness, and well-being.
 
-## Get started
+> Launching in Q3 2025
 
-1. Install dependencies
+## Technologies Used
 
-   ```bash
-   npm install
-   ```
+- React Native
+- Expo
+- TypeScript
+- Tailwind CSS (via NativeWind + Shadcn/UI)
+- Expo Router for navigation
 
-2. Start the app
+## Application Description
 
-   ```bash
-    npx expo start
-   ```
+Motionext is an all-in-one application that offers a variety of features to help users maintain a healthy lifestyle:
 
-In the output, you'll find options to open the app in a
+1. **Body Measurements Report and Log**: Allows users to record and monitor their body measurements, including the option to add photos for visual progress tracking.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+2. **Calorie Counter**: Helps users log their food intake and calculate consumed calories, based on a food API.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+3. **Workout Routine Assistant**: Enables users to create and manage their workout routines, record weights and repetitions, and visualize their progress over time.
 
-## Get a fresh project
+4. **Liquid Intake Monitor**: Helps users track their daily water and other liquid intake, with personalized goals based on individual factors.
 
-When you're ready, run:
+5. **Intermittent Fasting**: Provides guidance and monitoring for users interested in practicing intermittent fasting, with safety considerations.
 
-```bash
-npm run reset-project
-```
+6. **Mental Health**: Offers resources such as articles, audiobooks, and relaxing sounds to support users' mental health.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+7. **Cardiology Monitor**: Allows users to record and track their blood pressure and heart rate.
 
-## Learn more
+8. **Medication Reminder**: Sends notifications to remind users to take their medications.
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Motionext aims to be a comprehensive tool to help users achieve their health and fitness goals, offering a variety of functionalities in a single intuitive and easy-to-use application.
