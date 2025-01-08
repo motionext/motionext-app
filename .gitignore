@@ -83,3 +83,4 @@ bun.lockb
 
 # env
 .env.*
+!.env.template
