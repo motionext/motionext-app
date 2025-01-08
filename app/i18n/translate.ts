@@ -20,7 +20,7 @@ import { TxKeyPath } from "./i18n"
  * ```ts
  * import { translate } from "./i18n"
  *
- * translate("common:ok", { name: "world" })
+ * translate("", { name: "world" })
  * // => "Hello world!"
  * ```
  */

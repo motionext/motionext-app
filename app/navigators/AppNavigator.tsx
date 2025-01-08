@@ -11,6 +11,7 @@ import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
 import { ComponentProps } from "react"
+import { useAuth } from "app/services/auth/useAuth"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -27,6 +28,7 @@ import { ComponentProps } from "react"
  */
 export type AppStackParamList = {
   Welcome: undefined
+  SignIn: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -49,6 +51,10 @@ const AppStack = observer(function AppStack() {
     theme: { colors },
   } = useAppTheme()
 
+  const { isAuthenticated, initialCheckDone } = useAuth()
+  if (!initialCheckDone) return null
+  console.log(`[AUTH] User is ${isAuthenticated ? "authenticated" : "not authenticated."}`)
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -59,8 +65,18 @@ const AppStack = observer(function AppStack() {
         },
       }}
     >
-      <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+        </>
+      ) : (
+        <Stack.Screen
+          name="SignIn"
+          component={Screens.SignInScreen}
+          options={{ animationTypeForReplace: "pop" }}
+        />
+      )}
     </Stack.Navigator>
   )
 })

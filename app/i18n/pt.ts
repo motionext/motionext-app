@@ -1,9 +1,5 @@
 const pt = {
-  common: {
-    ok: "OK!",
-    cancel: "Cancelar",
-    back: "Voltar",
-  },
+  common: {},
   welcomeScreen: {
     postscript: "Este é o ecrã de boas-vindas!",
     title: "Isto é o Motionext!",

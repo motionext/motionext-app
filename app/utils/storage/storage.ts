@@ -1,5 +1,23 @@
 import { MMKV } from "react-native-mmkv"
-export const storage = new MMKV()
+import * as SecureStore from "expo-secure-store"
+import * as Crypto from "expo-crypto"
+
+const fetchOrGenerateEncryptionKey = (): string => {
+  const encryptionKey = SecureStore.getItem("session-encryption-key")
+
+  if (encryptionKey) {
+    return encryptionKey
+  } else {
+    const uuid = Crypto.randomUUID()
+    SecureStore.setItem("session-encryption-key", uuid)
+    return uuid
+  }
+}
+
+export const storage = new MMKV({
+  id: "session",
+  encryptionKey: fetchOrGenerateEncryptionKey(),
+})
 
 /**
  * Loads a string from storage.
@@ -27,12 +45,13 @@ export function loadString(key: string): string | null {
  * @param key The key to fetch.
  * @param value The value to store.
  */
-export function saveString(key: string, value: string): boolean {
+export async function saveString(key: string, value: string): Promise<void> {
   try {
     storage.set(key, value)
-    return true
   } catch {
-    return false
+    if (__DEV__) {
+      console.warn(`Failed to set key "${key}" in secure storage`)
+    }
   }
 }
 

@@ -15,10 +15,11 @@ import Config from "./config"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import { loadDateFnsLocale } from "./utils/formatDate"
 import { initCrashReporting } from "./utils/crashReporting"
+import { AuthProvider } from "./services/auth/useAuth"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
-// Web linking configuration
+// Web linking configuration (deep link)
 const prefix = Linking.createURL("/")
 const config = {
   screens: {},
@@ -67,7 +68,7 @@ function App(props: AppProps) {
      * Note: (vanilla iOS) Might notice the splash-screen logo change size.
      *    This happens in debug/development mode. Try building the app for release.
      */
-    setTimeout(hideSplashScreen, 200)
+    setTimeout(hideSplashScreen, 500)
   })
 
   /**
@@ -94,17 +95,19 @@ function App(props: AppProps) {
 
   // otherwise, it's ok to render the app
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={Config.catchErrors}>
-        <KeyboardProvider>
-          <AppNavigator
-            linking={linking}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
-        </KeyboardProvider>
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <AuthProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <ErrorBoundary catchErrors={Config.catchErrors}>
+          <KeyboardProvider>
+            <AppNavigator
+              linking={linking}
+              initialState={initialNavigationState}
+              onStateChange={onNavigationStateChange}
+            />
+          </KeyboardProvider>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </AuthProvider>
   )
 }
 
