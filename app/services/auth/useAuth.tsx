@@ -26,7 +26,7 @@ type SignUpProps = {
 }
 
 type AuthContextType = {
-  signIn: (props: { token: string }) => Promise<AuthTokenResponsePassword>
+  signIn: (props: SignInProps) => Promise<AuthTokenResponsePassword>
   signUp: (props: SignUpProps) => Promise<AuthResponse>
   signOut: () => void
 } & AuthState
