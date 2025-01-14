@@ -6,6 +6,7 @@ import { useFonts } from "expo-font"
 import { useEffect, useState } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
+import * as SplashScreen from "expo-splash-screen"
 import { useInitialRootStore } from "./models"
 import { AppNavigator, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
@@ -25,17 +26,11 @@ const config = {
   screens: {},
 }
 
-interface AppProps {
-  hideSplashScreen: () => Promise<void>
-}
-
 /**
  * This is the root component of the app.
- * @param {AppProps} props - The props for the `App` component.
  * @returns {JSX.Element} The rendered `App` component.
  */
-function App(props: AppProps) {
-  const { hideSplashScreen } = props
+export function App() {
   const {
     initialNavigationState,
     onNavigationStateChange,
@@ -62,13 +57,8 @@ function App(props: AppProps) {
      * splash screen for just a bit longer to prevent flicker.
      * Slightly delaying splash screen hiding for better UX; can be customized
      * or removed as needed.
-     * Note: (vanilla Android) The splash-screen will not appear if launch app
-     *    via the terminal or Android Studio. Kill the app and launch it
-     *    normally by tapping on the launcher icon. https://stackoverflow.com/a/69831106
-     * Note: (vanilla iOS) Might notice the splash-screen logo change size.
-     *    This happens in debug/development mode. Try building the app for release.
      */
-    setTimeout(hideSplashScreen, 500)
+    setTimeout(SplashScreen.hideAsync, 500)
   })
 
   /**
@@ -110,5 +100,3 @@ function App(props: AppProps) {
     </AuthProvider>
   )
 }
-
-export default App
