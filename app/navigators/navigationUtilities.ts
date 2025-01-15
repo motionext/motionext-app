@@ -1,20 +1,20 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { BackHandler, Platform } from "react-native"
 import {
-  NavigationState,
-  PartialState,
   createNavigationContainerRef,
   NavigationProp,
+  NavigationState,
+  PartialState,
 } from "@react-navigation/native"
+import * as Linking from "expo-linking"
+
 import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
+import { useAuth } from "../services/auth/useAuth"
+import { supabase } from "../services/auth/supabase"
+import * as storage from "../utils/storage"
 import { useIsMounted } from "../utils/useIsMounted"
 import type { AppStackParamList, NavigationProps } from "./AppNavigator"
-
-import * as storage from "../utils/storage"
-import * as Linking from "expo-linking"
-import { supabase } from "../services/auth/supabase"
-import { useAuth } from "../services/auth/useAuth"
 
 type Storage = typeof storage
 
