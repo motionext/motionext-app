@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react"
-import { ErrorDetails } from "./ErrorDetails"
+import { ErrorDetails } from "@/screens/ErrorScreen/ErrorDetails"
 import { reportCrash } from "@/utils/crashReporting"
 
 interface Props {

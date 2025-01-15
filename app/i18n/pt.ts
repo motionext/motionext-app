@@ -19,6 +19,12 @@ const pt = {
       button: "Vamos tentar novamente",
     },
   },
+  verifyEmailScreen: {
+    title: "Verifique o seu email",
+    description:
+      "Enviamos um link de confirmação para o seu email. Por favor, verifique a sua caixa de entrada e clique no link para confirmar sua identidade.",
+    button: "Voltar para o início",
+  },
 }
 
 export default pt

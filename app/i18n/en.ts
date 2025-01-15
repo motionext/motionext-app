@@ -18,6 +18,12 @@ const en = {
       button: "Let's try this again",
     },
   },
+  verifyEmailScreen: {
+    title: "Verify your email",
+    description:
+      "We've sent a confirmation link to your email. Please check your inbox and click the link to confirm your account.",
+    button: "Back to home",
+  },
 }
 
 export default en

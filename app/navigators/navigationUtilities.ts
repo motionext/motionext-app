@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from "react"
-import { BackHandler, Linking, Platform } from "react-native"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { BackHandler, Platform } from "react-native"
 import {
   NavigationState,
   PartialState,
   createNavigationContainerRef,
+  NavigationProp,
 } from "@react-navigation/native"
 import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
@@ -11,6 +12,9 @@ import { useIsMounted } from "../utils/useIsMounted"
 import type { AppStackParamList, NavigationProps } from "./AppNavigator"
 
 import * as storage from "../utils/storage"
+import * as Linking from "expo-linking"
+import { supabase } from "../services/auth/supabase"
+import { useAuth } from "../services/auth/useAuth"
 
 type Storage = typeof storage
 
@@ -203,4 +207,76 @@ export function resetRoot(
   if (navigationRef.isReady()) {
     navigationRef.resetRoot(state)
   }
+}
+
+/**
+ * Custom hook to manage deep links
+ */
+export function useDeepLinks() {
+  const { handleDeepLinkSignIn } = useAuth()
+
+  const handleDeepLink = useCallback(
+    async (url: string | null) => {
+      if (!url) return
+
+      // Verify email after sign up
+      if (url.includes("verify-email")) {
+        const token = url.split("token=")[1]?.split("&")[0]
+        if (token) {
+          if (__DEV__) {
+            console.log("[DEEP LINK] Token received:", token)
+          }
+
+          try {
+            // Set session using the token
+            const {
+              data: { session },
+              error,
+            } = await supabase.auth.setSession({
+              access_token: token,
+              refresh_token: token,
+            })
+
+            if (error && __DEV__) {
+              console.log("[DEEP LINK] Error setting session:", error)
+              return
+            }
+
+            if (session && __DEV__) {
+              console.log("[DEEP LINK] Session set, handling sign in")
+              handleDeepLinkSignIn(
+                session,
+                navigationRef as unknown as NavigationProp<AppStackParamList>,
+              )
+            }
+          } catch (error) {
+            if (__DEV__) {
+              console.log("[DEEP LINK] Error in session process:", error)
+            }
+          }
+        }
+      }
+    },
+    [handleDeepLinkSignIn],
+  )
+
+  useEffect(() => {
+    Linking.getInitialURL().then((url) => {
+      if (url && __DEV__) {
+        console.log("[DEEP LINK] Initial URL:", url)
+      }
+      handleDeepLink(url)
+    })
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      if (url && __DEV__) {
+        console.log("[DEEP LINK] New URL:", url)
+      }
+      handleDeepLink(url)
+    })
+
+    return () => {
+      subscription.remove()
+    }
+  }, [handleDeepLink])
 }

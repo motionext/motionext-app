@@ -2,11 +2,13 @@ import { ComponentType, FC, useMemo, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { z } from "zod"
 import { Image, ImageStyle, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
+import { AppStackParamList, AppStackScreenProps } from "app/navigators"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "app/components"
 import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle"
 import { colors, spacing } from "app/theme"
 import { useAuth } from "app/services/auth/useAuth"
+import { NavigationProp } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 
 const logo = require("../../assets/images/logo.png")
 
@@ -20,6 +22,7 @@ interface SignInScreenProps extends AppStackScreenProps<"SignIn"> {}
 
 export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScreen() {
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const { signIn, signUp } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -83,10 +86,21 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
 
     try {
       setIsSigningUp(true)
-      const { error } = await signUp({ email, password })
+      const { error } = await signUp({
+        email: email.toLowerCase(),
+        password,
+      })
+
       if (error) {
         setValidationErrors(new Map([["global", error.message]]))
+        return
       }
+
+      // If there's no error, navigate to VerifyEmail
+      navigation.navigate("VerifyEmail")
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
+      setValidationErrors(new Map([["global", errorMessage]]))
     } finally {
       setIsSigningUp(false)
     }
@@ -95,7 +109,9 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
   const onForgotPassword = () => {
     // Forgot Password Flow
     // TODO: Implement forget password flow
-    console.log("[AUTH] Forgot Password Flow")
+    if (__DEV__) {
+      console.log("[AUTH] Forgot Password Flow")
+    }
   }
 
   // TODO: Add dark mode support

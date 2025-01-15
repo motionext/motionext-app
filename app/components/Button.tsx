@@ -8,8 +8,8 @@ import {
   ViewStyle,
 } from "react-native"
 import type { ThemedStyle, ThemedStyleArray } from "@/theme"
-import { $styles } from "../theme"
-import { Text, TextProps } from "./Text"
+import { $styles } from "@/theme"
+import { Text, TextProps } from "@/components/Text"
 import { useAppTheme } from "@/utils/useAppTheme"
 
 type Presets = "default" | "filled" | "reversed"

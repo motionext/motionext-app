@@ -1,29 +1,32 @@
 /* eslint-disable import/first */
 import "./utils/gestureHandler"
-import { initI18n } from "./i18n"
+import { initI18n } from "@/i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
 import { useEffect, useState } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import * as SplashScreen from "expo-splash-screen"
-import { useInitialRootStore } from "./models"
-import { AppNavigator, useNavigationPersistence } from "./navigators"
-import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
-import * as storage from "./utils/storage"
-import { customFontsToLoad } from "./theme"
-import Config from "./config"
+import { useInitialRootStore } from "@/models"
+import { AppNavigator, useNavigationPersistence } from "@/navigators"
+import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
+import * as storage from "@/utils/storage"
+import { customFontsToLoad } from "@/theme"
+import Config from "@/config"
 import { KeyboardProvider } from "react-native-keyboard-controller"
-import { loadDateFnsLocale } from "./utils/formatDate"
-import { initCrashReporting } from "./utils/crashReporting"
-import { AuthProvider } from "./services/auth/useAuth"
+import { loadDateFnsLocale } from "@/utils/formatDate"
+import { initCrashReporting } from "@/utils/crashReporting"
+import { AuthProvider } from "@/services/auth/useAuth"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 // Web linking configuration (deep link)
 const prefix = Linking.createURL("/")
 const config = {
-  screens: {},
+  screens: {
+    VerifyEmail: "verify-email",
+    welcome: "welcome",
+  },
 }
 
 /**

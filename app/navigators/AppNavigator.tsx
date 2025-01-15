@@ -7,11 +7,11 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
 import * as Screens from "@/screens"
-import Config from "../config"
-import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
+import Config from "@/config"
+import { navigationRef, useBackButtonHandler, useDeepLinks } from "@/navigators/navigationUtilities"
 import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
 import { ComponentProps } from "react"
-import { useAuth } from "app/services/auth/useAuth"
+import { useAuth } from "@/services/auth/useAuth"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -29,6 +29,7 @@ import { useAuth } from "app/services/auth/useAuth"
 export type AppStackParamList = {
   Welcome: undefined
   SignIn: undefined
+  VerifyEmail: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -46,14 +47,17 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<AppStackParamList>()
 
-const AppStack = observer(function AppStack() {
+export const AppStack = observer(function AppStack() {
   const {
     theme: { colors },
   } = useAppTheme()
 
-  const { isAuthenticated, initialCheckDone } = useAuth()
-  if (!initialCheckDone) return null
-  console.log(`[AUTH] User is ${isAuthenticated ? "authenticated" : "not authenticated."}`)
+  const { authStatus, initialCheckDone } = useAuth()
+
+  // Aguardar a verificação inicial
+  if (!initialCheckDone) {
+    return null
+  }
 
   return (
     <Stack.Navigator
@@ -65,17 +69,15 @@ const AppStack = observer(function AppStack() {
         },
       }}
     >
-      {isAuthenticated ? (
+      {authStatus === "authenticated" ? (
         <>
           <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
         </>
       ) : (
-        <Stack.Screen
-          name="SignIn"
-          component={Screens.SignInScreen}
-          options={{ animationTypeForReplace: "pop" }}
-        />
+        <>
+          <Stack.Screen name="SignIn" component={Screens.SignInScreen} />
+          <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
+        </>
       )}
     </Stack.Navigator>
   )
@@ -83,11 +85,12 @@ const AppStack = observer(function AppStack() {
 
 export interface NavigationProps extends Partial<ComponentProps<typeof NavigationContainer>> {}
 
-export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
+export function AppNavigator(props: NavigationProps) {
   const { themeScheme, navigationTheme, setThemeContextOverride, ThemeProvider } =
     useThemeProvider()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+  useDeepLinks() // Watch for deep links appearing
 
   return (
     <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
@@ -96,4 +99,4 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       </NavigationContainer>
     </ThemeProvider>
   )
-})
+}

@@ -6,8 +6,10 @@ import {
   useEffect,
   useState,
 } from "react"
-import { Session, supabase } from "./supabase"
+import { Session, supabase } from "@/services/auth/supabase"
 import { AuthResponse, AuthTokenResponsePassword } from "@supabase/supabase-js"
+import { NavigationProp } from "@react-navigation/native"
+import { AppStackParamList } from "@/navigators"
 
 type AuthState = {
   isAuthenticated: boolean
@@ -29,6 +31,12 @@ type AuthContextType = {
   signIn: (props: SignInProps) => Promise<AuthTokenResponsePassword>
   signUp: (props: SignUpProps) => Promise<AuthResponse>
   signOut: () => void
+  handleDeepLinkSignIn: (
+    session: Session,
+    navigation?: NavigationProp<AppStackParamList>,
+  ) => Promise<void>
+  setUser: (user: any) => void
+  authStatus: "signIn" | "authenticated"
 } & AuthState
 
 const AuthContext = createContext<AuthContextType>({
@@ -38,6 +46,9 @@ const AuthContext = createContext<AuthContextType>({
   signIn: () => new Promise(() => ({})),
   signUp: () => new Promise(() => ({})),
   signOut: () => undefined,
+  handleDeepLinkSignIn: () => new Promise(() => ({})),
+  setUser: () => undefined,
+  authStatus: "signIn",
 })
 
 export function useAuth() {
@@ -55,72 +66,103 @@ export function useAuth() {
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [token, setToken] = useState<AuthState["token"]>(undefined)
   const [initialCheckDone, setInitialCheckDone] = useState(false)
+  const [authStatus, setAuthStatus] = useState<"signIn" | "authenticated">("signIn")
+
+  const updateAuthState = useCallback(async (session: Session | null) => {
+    try {
+      if (!session?.access_token) {
+        setToken(undefined)
+        setAuthStatus("signIn")
+        return
+      }
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser(session.access_token)
+
+      if (error || !user?.email_confirmed_at) {
+        setToken(undefined)
+        setAuthStatus("signIn")
+        return
+      }
+
+      setToken(session.access_token)
+      setAuthStatus("authenticated")
+    } catch (error) {
+      if (__DEV__) {
+        console.log("[AUTH] Error in updateAuthState:", error)
+      }
+      setToken(undefined)
+      setAuthStatus("signIn")
+    }
+  }, [])
 
   useEffect(() => {
+    let isMounted = true
+
+    const initialize = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        if (isMounted) {
+          await updateAuthState(session)
+          setInitialCheckDone(true)
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.log("[AUTH] Initial check error:", error)
+        }
+        if (isMounted) {
+          setInitialCheckDone(true)
+        }
+      }
+    }
+
+    initialize()
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("SUPABASE EVENT", event)
-      switch (event) {
-        case "SIGNED_OUT":
-          setToken(undefined)
-          break
-        case "INITIAL_SESSION":
-        case "SIGNED_IN":
-        case "TOKEN_REFRESHED":
-          setToken(session?.access_token)
-          break
-        default:
-        // no-op
+    } = supabase.auth.onAuthStateChange(async (_, session) => {
+      if (isMounted) {
+        await updateAuthState(session)
       }
-      setInitialCheckDone(true) // Flag as finished after the main event
     })
 
     return () => {
+      isMounted = false
       subscription.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase])
+  }, [updateAuthState])
 
-  const signIn = useCallback(
-    async ({ email, password }: SignInProps) => {
-      const result = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+  const signIn = useCallback(async ({ email, password }: SignInProps) => {
+    const result = await supabase.auth.signInWithPassword({ email, password })
+    return result
+  }, [])
 
-      if (result.data?.session?.access_token) {
-        setToken(result.data.session.access_token)
-      }
-
-      return result
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [supabase],
-  )
-
-  const signUp = useCallback(
-    async ({ email, password }: SignUpProps) => {
-      const result = await supabase.auth.signUp({
-        email,
-        password,
-      })
-
-      if (result.data?.session?.access_token) {
-        setToken(result.data.session.access_token)
-      }
-
-      return result
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [supabase],
-  )
+  const signUp = useCallback(async ({ email, password }: SignUpProps) => {
+    const result = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: "motionext://verify-email" },
+    })
+    return result
+  }, [])
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
-    setToken(undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase])
+  }, [])
+
+  const handleDeepLinkSignIn = useCallback(
+    async (session: Session, navigation?: NavigationProp<AppStackParamList>) => {
+      if (session?.access_token) {
+        await updateAuthState(session)
+        navigation?.navigate("Welcome")
+      }
+    },
+    [updateAuthState],
+  )
 
   return (
     <AuthContext.Provider
@@ -131,6 +173,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         signIn,
         signUp,
         signOut,
+        handleDeepLinkSignIn,
+        setUser: updateAuthState,
+        authStatus,
       }}
     >
       {children}

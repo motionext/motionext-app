@@ -10,6 +10,7 @@ import {
   darkTheme,
 } from "@/theme"
 import * as SystemUI from "expo-system-ui"
+import { reportCrash } from "./crashReporting"
 
 type ThemeContextType = {
   themeScheme: ThemeContexts
@@ -20,7 +21,9 @@ type ThemeContextType = {
 export const ThemeContext = createContext<ThemeContextType>({
   themeScheme: undefined, // default to the system theme
   setThemeContextOverride: (_newTheme: ThemeContexts) => {
-    console.error("Tried to call setThemeContextOverride before the ThemeProvider was initialized")
+    reportCrash(
+      new Error("Tried to call setThemeContextOverride before the ThemeProvider was initialized"),
+    )
   },
 })
 

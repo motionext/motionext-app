@@ -2,12 +2,12 @@ import { observer } from "mobx-react-lite"
 import { FC } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { Text, Screen, Button } from "@/components"
-import { isRTL } from "../i18n"
-import { AppStackScreenProps } from "../navigators"
+import { isRTL } from "@/i18n"
+import { AppStackScreenProps } from "@/navigators"
 import { $styles, type ThemedStyle } from "@/theme"
-import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 import { useAppTheme } from "@/utils/useAppTheme"
-import { useAuth } from "app/services/auth/useAuth"
+import { useAuth } from "@/services/auth/useAuth"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 const welcomeFace = require("../../assets/images/welcome-face.png")
