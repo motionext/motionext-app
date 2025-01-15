@@ -1,4 +1,4 @@
-import { ComponentType, FC, useMemo, useRef, useState } from "react"
+import { ComponentType, FC, useMemo, useRef, useState, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import { z } from "zod"
 import { Image, ImageStyle, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
@@ -20,10 +20,11 @@ const signInSchema = z.object({
 
 interface SignInScreenProps extends AppStackScreenProps<"SignIn"> {}
 
+// TODO: Improve design of the email templates in Supabase
 export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScreen() {
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, authStatus } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isPasswordHidden, setIsPasswordHidden] = useState(true)
@@ -34,6 +35,15 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
   const isLoading = isSigningIn || isSigningUp
 
   const passwordInput = useRef<TextInput>(null)
+
+  useEffect(() => {
+    if (authStatus === "authenticated") {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      })
+    }
+  }, [authStatus, navigation])
 
   const validateForm = () => {
     const result = signInSchema.safeParse({ email, password })
@@ -71,10 +81,16 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
 
     try {
       setIsSigningIn(true)
-      const { error } = await signIn({ email, password })
-      if (error) {
-        setValidationErrors(new Map([["global", error.message]]))
+      const response = await signIn({ email, password })
+
+      if (response.error) {
+        setValidationErrors(new Map([["global", response.error.message]]))
+        return
       }
+    } catch (error) {
+      reportError(error as Error)
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
+      setValidationErrors(new Map([["global", errorMessage]]))
     } finally {
       setIsSigningIn(false)
     }

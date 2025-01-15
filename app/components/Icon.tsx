@@ -9,7 +9,6 @@ import {
   ViewProps,
   ViewStyle,
 } from "react-native"
-import { useAppTheme } from "@/utils/useAppTheme"
 
 export type IconTypes = keyof typeof iconRegistry
 
@@ -66,11 +65,9 @@ export function Icon(props: IconProps) {
     TouchableOpacityProps | ViewProps
   >
 
-  const { theme } = useAppTheme()
-
   const $imageStyle: StyleProp<ImageStyle> = [
     $imageStyleBase,
-    { tintColor: color ?? theme.colors.text },
+    { tintColor: color },
     size !== undefined && { width: size, height: size },
     $imageStyleOverride,
   ]
@@ -87,11 +84,13 @@ export function Icon(props: IconProps) {
 }
 
 export const iconRegistry = {
+  apple: require("../../assets/icons/apple.png"),
   back: require("../../assets/icons/back.png"),
   bell: require("../../assets/icons/bell.png"),
   caretLeft: require("../../assets/icons/caretLeft.png"),
   caretRight: require("../../assets/icons/caretRight.png"),
   check: require("../../assets/icons/check.png"),
+  google: require("../../assets/icons/google.png"),
   hidden: require("../../assets/icons/hidden.png"),
   ladybug: require("../../assets/icons/ladybug.png"),
   lock: require("../../assets/icons/lock.png"),

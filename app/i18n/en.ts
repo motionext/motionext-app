@@ -1,11 +1,12 @@
 const en = {
   common: {
     ok: "OK",
+    google: "Google",
+    apple: "Apple",
   },
-  welcomeScreen: {
-    postscript: "This is the welcome screen!",
-    title: "This is Motionext!",
-    slogan: "More healthy, more connected.",
+  landingScreen: {
+    continueWithMail: "Continue with email",
+    or: "or continue with",
   },
   errorScreen: {
     title: "Something went wrong!",
@@ -30,6 +31,9 @@ const en = {
     title: "Error",
     emailAppNotFound: "Could not open email app. Please check if you have an email app configured.",
     emailAppError: "An error occurred while trying to open email",
+  },
+  home: {
+    logout: "Logout",
   },
 }
 

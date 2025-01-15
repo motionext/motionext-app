@@ -1,3 +1,4 @@
+// External Libraries
 import { useCallback, useEffect, useRef, useState } from "react"
 import { BackHandler, Platform } from "react-native"
 import {
@@ -8,6 +9,7 @@ import {
 } from "@react-navigation/native"
 import * as Linking from "expo-linking"
 
+// Internal Imports
 import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
 import { useAuth } from "../services/auth/useAuth"
@@ -15,6 +17,7 @@ import { supabase } from "../services/auth/supabase"
 import * as storage from "../utils/storage"
 import { useIsMounted } from "../utils/useIsMounted"
 import type { AppStackParamList, NavigationProps } from "./AppNavigator"
+import { reportCrash } from "@/utils/crashReporting"
 
 type Storage = typeof storage
 
@@ -237,22 +240,21 @@ export function useDeepLinks() {
               refresh_token: token,
             })
 
-            if (error && __DEV__) {
-              console.log("[DEEP LINK] Error setting session:", error)
-              return
+            if (error) {
+              return reportCrash(error)
             }
 
-            if (session && __DEV__) {
-              console.log("[DEEP LINK] Session set, handling sign in")
+            if (session) {
+              if (__DEV__) {
+                console.log("[DEEP LINK] Session set, handling sign in")
+              }
               handleDeepLinkSignIn(
                 session,
                 navigationRef as unknown as NavigationProp<AppStackParamList>,
               )
             }
           } catch (error) {
-            if (__DEV__) {
-              console.log("[DEEP LINK] Error in session process:", error)
-            }
+            return reportCrash(error as Error)
           }
         }
       }

@@ -17,6 +17,15 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
 
   return {
     ...config,
-    plugins: [...existingPlugins, require("./plugins/withSplashScreen").withSplashScreen],
+    plugins: [
+      ...existingPlugins,
+      require("./plugins/withSplashScreen").withSplashScreen,
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          iosUrlScheme: process.env.EXPO_PUBLIC_GOOGLE_IOS_SCHEME_CLIENT_ID,
+        },
+      ],
+    ],
   }
 }

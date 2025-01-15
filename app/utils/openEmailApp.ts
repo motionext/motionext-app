@@ -1,5 +1,6 @@
 import { Linking, Alert } from "react-native"
 import { translate } from "@/i18n"
+import { reportCrash } from "./crashReporting"
 
 export async function openEmailApp() {
   try {
@@ -16,9 +17,7 @@ export async function openEmailApp() {
     // For example: email app was uninstalled between checking and opening
     await Linking.openURL("mailto:")
   } catch (error) {
-    if (__DEV__) {
-      console.error("[DEEP LINK] Error opening email app", error)
-    }
+    reportCrash(error as Error)
     Alert.alert(translate("errors:title"), translate("errors:emailAppError"), [
       { text: translate("common:ok") },
     ])

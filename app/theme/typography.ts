@@ -9,13 +9,17 @@ import {
   SpaceGrotesk_600SemiBold as spaceGroteskSemiBold,
   SpaceGrotesk_700Bold as spaceGroteskBold,
 } from "@expo-google-fonts/space-grotesk"
+import { SourceSansPro_900Black as sourceSansProBlack } from "@expo-google-fonts/source-sans-pro"
 
 export const customFontsToLoad = {
+  // Space Grotesk
   spaceGroteskLight,
   spaceGroteskRegular,
   spaceGroteskMedium,
   spaceGroteskSemiBold,
   spaceGroteskBold,
+  // Source Sans Pro
+  sourceSansProBlack,
 }
 
 const fonts = {
@@ -48,6 +52,9 @@ const fonts = {
   monospace: {
     // Android only font.
     normal: "monospace",
+  },
+  sourceSans: {
+    black: "sourceSansProBlack",
   },
 }
 

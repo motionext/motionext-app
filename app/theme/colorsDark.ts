@@ -33,6 +33,8 @@ const palette = {
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
+
+  crayola: "#0052B4",
 } as const
 
 export const colors = {
@@ -40,7 +42,7 @@ export const colors = {
   transparent: "rgba(0, 0, 0, 0)",
   text: palette.neutral800,
   textDim: palette.neutral600,
-  background: palette.neutral200,
+  background: palette.neutral100,
   border: palette.neutral400,
   tint: palette.primary500,
   tintInactive: palette.neutral300,

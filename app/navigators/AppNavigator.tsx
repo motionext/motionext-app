@@ -30,6 +30,7 @@ export type AppStackParamList = {
   Welcome: undefined
   SignIn: undefined
   VerifyEmail: undefined
+  Home: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -54,7 +55,10 @@ export const AppStack = observer(function AppStack() {
 
   const { authStatus, initialCheckDone } = useAuth()
 
-  // Aguardar a verificação inicial
+  if (__DEV__) {
+    console.log("[AUTH] Auth status:", authStatus)
+  }
+
   if (!initialCheckDone) {
     return null
   }
@@ -68,15 +72,18 @@ export const AppStack = observer(function AppStack() {
           backgroundColor: colors.background,
         },
       }}
+      initialRouteName={authStatus === "authenticated" ? "Home" : "Welcome"}
     >
-      {authStatus === "authenticated" ? (
+      {/* Public routes */}
+      <Stack.Screen name="Welcome" component={Screens.LandingScreen} />
+      <Stack.Screen name="SignIn" component={Screens.SignInScreen} />
+      <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
+      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+
+      {authStatus === "authenticated" && (
+        // Authenticated routes
         <>
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="SignIn" component={Screens.SignInScreen} />
-          <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
+          <Stack.Screen name="Home" component={Screens.HomeScreen} />
         </>
       )}
     </Stack.Navigator>
