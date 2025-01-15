@@ -1,5 +1,7 @@
 const en = {
-  common: {},
+  common: {
+    ok: "OK",
+  },
   welcomeScreen: {
     postscript: "This is the welcome screen!",
     title: "This is Motionext!",
@@ -22,7 +24,12 @@ const en = {
     title: "Verify your email",
     description:
       "We've sent a confirmation link to your email. Please check your inbox and click the link to confirm your account.",
-    button: "Back to home",
+    openEmail: "Open email",
+  },
+  errors: {
+    title: "Error",
+    emailAppNotFound: "Could not open email app. Please check if you have an email app configured.",
+    emailAppError: "An error occurred while trying to open email",
   },
 }
 

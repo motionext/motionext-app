@@ -95,6 +95,7 @@ export const iconRegistry = {
   hidden: require("../../assets/icons/hidden.png"),
   ladybug: require("../../assets/icons/ladybug.png"),
   lock: require("../../assets/icons/lock.png"),
+  mail: require("../../assets/icons/mail.png"),
   menu: require("../../assets/icons/menu.png"),
   more: require("../../assets/icons/more.png"),
   settings: require("../../assets/icons/settings.png"),

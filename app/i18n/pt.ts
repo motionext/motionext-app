@@ -1,5 +1,7 @@
 const pt = {
-  common: {},
+  common: {
+    ok: "OK",
+  },
   welcomeScreen: {
     postscript: "Este é o ecrã de boas-vindas!",
     title: "Isto é o Motionext!",
@@ -22,8 +24,14 @@ const pt = {
   verifyEmailScreen: {
     title: "Verifique o seu email",
     description:
-      "Enviamos um link de confirmação para o seu email. Por favor, verifique a sua caixa de entrada e clique no link para confirmar sua identidade.",
-    button: "Voltar para o início",
+      "Enviamos um link de confirmação para o seu email. Clique no link para confirmar sua identidade.",
+    openEmail: "Abrir email",
+  },
+  errors: {
+    title: "Erro",
+    emailAppNotFound:
+      "Não foi possível abrir o email. Por favor, verifique se há um app de email configurado.",
+    emailAppError: "Ocorreu um erro ao tentar abrir o email",
   },
 }
 
