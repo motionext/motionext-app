@@ -2,7 +2,6 @@ const en = {
   common: {
     ok: "OK",
     google: "Google",
-    apple: "Apple",
   },
   landingScreen: {
     continueWithMail: "Continue with email",

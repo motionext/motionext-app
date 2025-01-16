@@ -90,15 +90,17 @@ export const LandingScreen: FC<LandingScreenProps> = observer(function LandingSc
                 style={themed($socialButtonStyle)}
                 textStyle={themed($socialButtonText)}
               />
-              <Button
-                tx="common:apple"
-                LeftAccessory={(props) => (
-                  <Icon icon="apple" size={20} color={theme.colors.palette.neutral900} {...props} />
-                )}
-                onPress={() => {}}
-                style={themed($socialButtonStyle)}
-                textStyle={themed($socialButtonText)}
-              />
+              {/*
+                <Button
+                  tx="common:apple"
+                  LeftAccessory={(props) => (
+                    <Icon icon="apple" size={20} color={theme.colors.palette.neutral900} {...props} />
+                  )}
+                  onPress={() => {}}
+                  style={themed($socialButtonStyle)}
+                  textStyle={themed($socialButtonText)}
+                />
+              */}
             </View>
           </View>
         </BlurView>
@@ -180,7 +182,7 @@ const $socialButtonsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $socialButtonStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flex: 1,
-  maxWidth: "47%",
+  maxWidth: "100%",
   paddingVertical: spacing.sm,
   borderRadius: spacing.sm,
   flexDirection: "row",

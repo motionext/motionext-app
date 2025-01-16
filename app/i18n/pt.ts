@@ -2,7 +2,6 @@ const pt = {
   common: {
     ok: "OK",
     google: "Google",
-    apple: "Apple",
   },
   landingScreen: {
     continueWithMail: "Continuar com o email",
