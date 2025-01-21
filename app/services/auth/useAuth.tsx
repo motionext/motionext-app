@@ -1,4 +1,3 @@
-// External Libraries
 import {
   createContext,
   PropsWithChildren,
@@ -11,10 +10,12 @@ import { NavigationProp } from "@react-navigation/native"
 import { AuthError, AuthResponse, type User } from "@supabase/supabase-js"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
-// Internal Imports
 import { AppStackParamList } from "@/navigators"
 import { Session, supabase } from "@/services/auth/supabase"
 import { reportCrash } from "@/utils/crashReporting"
+import { getAuthErrorMessage } from "@/services/auth/errors"
+import { showMessage } from "@/utils/showMessage"
+import { translate } from "@/i18n"
 
 type AuthState = {
   isAuthenticated: boolean
@@ -44,6 +45,7 @@ type AuthContextType = {
   setUser: (user: User | null) => void
   authStatus: "signIn" | "authenticated"
   signInWithGoogle: () => Promise<boolean>
+  resetPassword: (email: string) => Promise<{ error: Error | null }>
 } & AuthState
 
 const AuthContext = createContext<AuthContextType>({
@@ -58,6 +60,7 @@ const AuthContext = createContext<AuthContextType>({
   setUser: () => undefined,
   authStatus: "signIn",
   signInWithGoogle: () => new Promise(() => ({})),
+  resetPassword: () => new Promise(() => ({})),
 })
 
 export function useAuth() {
@@ -205,7 +208,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         })
 
         if (error) {
-          reportCrash(new Error("[GOOGLE AUTH] Error signing in with ID token"))
+          showMessage({
+            title: getAuthErrorMessage(error.code),
+            type: "error",
+          })
           return false
         }
 
@@ -215,16 +221,34 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           setAuthStatus("authenticated")
           return true
         }
-      } else {
-        // User cancelled the sign in process. Ignore.
-        return false
       }
+
+      showMessage({
+        title: translate("auth:errors.cancelled"),
+        type: "error",
+      })
+      return false
     } catch (error) {
       reportCrash(error as Error)
+      showMessage({
+        title: translate("auth:errors.unknown"),
+        type: "error",
+      })
       return false
     }
-    return false
   }, [updateAuthState])
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "https://www.motionext.app/reset-password/",
+      })
+
+      return { error: error }
+    } catch (error) {
+      return { error: error as Error }
+    }
+  }
 
   return (
     <AuthContext.Provider
@@ -240,6 +264,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setUser,
         authStatus,
         signInWithGoogle,
+        resetPassword,
       }}
     >
       {children}

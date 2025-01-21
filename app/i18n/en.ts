@@ -34,6 +34,19 @@ const en = {
   home: {
     logout: "Logout",
   },
+  auth: {
+    resetPassword: "Forgot your password?",
+    resetPasswordSuccessTitle: "Email sent successfully!",
+    resetPasswordSuccessDescription: "Check your inbox.",
+    errors: {
+      cancelled: "Authentication cancelled",
+      userBanned: "This account has been banned",
+      invalidCredentials: "Invalid email or password",
+      emailNotConfirmed: "Please confirm your email before logging in",
+      unknown: "An unexpected error occurred",
+      emailRequired: "Enter your email to reset your password",
+    },
+  },
 }
 
 export default en

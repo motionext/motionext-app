@@ -1,14 +1,16 @@
-import { ComponentType, FC, useMemo, useRef, useState, useEffect } from "react"
-import { observer } from "mobx-react-lite"
-import { z } from "zod"
-import { Image, ImageStyle, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { AppStackParamList, AppStackScreenProps } from "app/navigators"
-import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "app/components"
-import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle"
-import { colors, spacing } from "app/theme"
-import { useAuth } from "app/services/auth/useAuth"
 import { NavigationProp } from "@react-navigation/native"
 import { useNavigation } from "@react-navigation/native"
+import { observer } from "mobx-react-lite"
+import { ComponentType, FC, useEffect, useMemo, useRef, useState } from "react"
+import { Image, ImageStyle, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { z } from "zod"
+import { translate } from "@/i18n"
+import { showMessage } from "@/utils/showMessage"
+import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "app/components"
+import { AppStackParamList, AppStackScreenProps } from "app/navigators"
+import { useAuth } from "app/services/auth/useAuth"
+import { colors, spacing } from "app/theme"
+import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle"
 
 const logo = require("../../assets/images/logo.png")
 
@@ -24,7 +26,7 @@ interface SignInScreenProps extends AppStackScreenProps<"SignIn"> {}
 export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScreen() {
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const { signIn, signUp, authStatus } = useAuth()
+  const { signIn, signUp, authStatus, resetPassword } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isPasswordHidden, setIsPasswordHidden] = useState(true)
@@ -32,6 +34,7 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
 
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [isSigningUp, setIsSigningUp] = useState(false)
+  const [isResettingPassword, setIsResettingPassword] = useState(false)
   const isLoading = isSigningIn || isSigningUp
 
   const passwordInput = useRef<TextInput>(null)
@@ -122,11 +125,32 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
     }
   }
 
-  const onForgotPassword = () => {
-    // Forgot Password Flow
-    // TODO: Implement forget password flow
-    if (__DEV__) {
-      console.log("[AUTH] Forgot Password Flow")
+  const onForgotPassword = async () => {
+    // If the email is empty, show the error message
+    if (!email) {
+      setValidationErrors(new Map([["email", translate("auth:errors.emailRequired")]]))
+      return
+    }
+
+    try {
+      setIsResettingPassword(true)
+      const { error } = await resetPassword(email)
+
+      if (error) {
+        setValidationErrors(new Map([["global", error.message]]))
+        return
+      }
+
+      showMessage({
+        title: translate("auth:resetPasswordSuccessTitle"),
+        description: translate("auth:resetPasswordSuccessDescription"),
+        type: "success",
+      })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
+      setValidationErrors(new Map([["global", errorMessage]]))
+    } finally {
+      setIsResettingPassword(false)
     }
   }
 
@@ -179,8 +203,12 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
             <Button onPress={onSignIn} disabled={isLoading}>
               {isSigningIn ? "Signing In..." : "Sign In"}
             </Button>
-            <Pressable style={$forgotPassword} onPress={onForgotPassword} disabled={isLoading}>
-              <Text preset="bold">Forgot Password?</Text>
+            <Pressable
+              style={$forgotPassword}
+              onPress={onForgotPassword}
+              disabled={isLoading || isResettingPassword}
+            >
+              <Text preset="bold" tx="auth:resetPassword" />
             </Pressable>
             <Text style={$buttonDivider}>- or -</Text>
             <Button preset="reversed" onPress={onSignUp} disabled={isLoading}>

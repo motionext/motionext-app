@@ -1,22 +1,25 @@
-/* eslint-disable import/first */
-import "./utils/gestureHandler"
-import { initI18n } from "@/i18n"
-import "./utils/ignoreWarnings"
-import { useFonts } from "expo-font"
 import { useEffect, useState } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
+import { useFonts } from "expo-font"
+import { KeyboardProvider } from "react-native-keyboard-controller"
 import * as Linking from "expo-linking"
 import * as SplashScreen from "expo-splash-screen"
-import { useInitialRootStore } from "@/models"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+
 import { AppNavigator, useNavigationPersistence } from "@/navigators"
-import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
-import * as storage from "@/utils/storage"
-import { customFontsToLoad } from "@/theme"
-import Config from "@/config"
-import { KeyboardProvider } from "react-native-keyboard-controller"
-import { loadDateFnsLocale } from "@/utils/formatDate"
-import { initCrashReporting } from "@/utils/crashReporting"
 import { AuthProvider } from "@/services/auth/useAuth"
+import Config from "@/config"
+import { customFontsToLoad } from "@/theme"
+import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
+import { initCrashReporting } from "@/utils/crashReporting"
+import { initI18n } from "@/i18n"
+import { loadDateFnsLocale } from "@/utils/formatDate"
+import { NotifierWrapper } from "react-native-notifier"
+import { useInitialRootStore } from "@/models"
+import * as storage from "@/utils/storage"
+
+import "./utils/gestureHandler"
+import "./utils/ignoreWarnings"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -88,18 +91,22 @@ export function App() {
 
   // otherwise, it's ok to render the app
   return (
-    <AuthProvider>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <ErrorBoundary catchErrors={Config.catchErrors}>
-          <KeyboardProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </KeyboardProvider>
-        </ErrorBoundary>
-      </SafeAreaProvider>
-    </AuthProvider>
+    <GestureHandlerRootView>
+      <AuthProvider>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <ErrorBoundary catchErrors={Config.catchErrors}>
+            <KeyboardProvider>
+              <NotifierWrapper>
+                <AppNavigator
+                  linking={linking}
+                  initialState={initialNavigationState}
+                  onStateChange={onNavigationStateChange}
+                />
+              </NotifierWrapper>
+            </KeyboardProvider>
+          </ErrorBoundary>
+        </SafeAreaProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   )
 }

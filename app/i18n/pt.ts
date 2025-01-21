@@ -36,6 +36,19 @@ const pt = {
   home: {
     logout: "Terminar sessão",
   },
+  auth: {
+    resetPassword: "Esqueceu a senha?",
+    resetPasswordSuccessTitle: "Email enviado com sucesso!",
+    resetPasswordSuccessDescription: "Verifique a sua caixa de entrada.",
+    errors: {
+      cancelled: "Autenticação cancelada",
+      userBanned: "Esta conta foi banida",
+      invalidCredentials: "E-mail ou senha incorretos",
+      emailNotConfirmed: "Por favor, confirme o seu e-mail antes de fazer login",
+      unknown: "Ocorreu um erro inesperado",
+      emailRequired: "Digite seu email para recuperar a senha",
+    },
+  },
 }
 
 export default pt
