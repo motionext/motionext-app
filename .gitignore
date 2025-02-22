@@ -76,7 +76,7 @@ web-build/
 .yarn/*
 
 # Bun
-bun.lockb
+bun.lock
 
 # Ignite
 /ignite

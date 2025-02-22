@@ -1,4 +1,4 @@
-import { NavigationProp } from "@react-navigation/native"
+import { CommonActions, NavigationProp } from "@react-navigation/native"
 import { useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import { ComponentType, FC, useEffect, useMemo, useRef, useState } from "react"
@@ -41,10 +41,12 @@ export const SignInScreen: FC<SignInScreenProps> = observer(function SignInScree
 
   useEffect(() => {
     if (authStatus === "authenticated") {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      })
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        }),
+      )
     }
   }, [authStatus, navigation])
 

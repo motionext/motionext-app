@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from "react"
-import { NavigationProp } from "@react-navigation/native"
+import { CommonActions, NavigationProp } from "@react-navigation/native"
 import { AuthError, AuthResponse, type User } from "@supabase/supabase-js"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
@@ -40,7 +40,7 @@ type AuthContextType = {
   signOut: () => void
   handleDeepLinkSignIn: (
     session: Session,
-    navigation?: NavigationProp<AppStackParamList>,
+    navigation: NavigationProp<AppStackParamList>,
   ) => Promise<void>
   setUser: (user: User | null) => void
   authStatus: "signIn" | "authenticated"
@@ -178,13 +178,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   }, [])
 
   const handleDeepLinkSignIn = useCallback(
-    async (session: Session, navigation?: NavigationProp<AppStackParamList>) => {
+    async (session: Session, navigation: NavigationProp<AppStackParamList>) => {
       if (session?.access_token) {
         await updateAuthState(session)
-        navigation?.reset({
-          index: 0,
-          routes: [{ name: "Home" }],
-        })
+
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          }),
+        )
       }
     },
     [updateAuthState],

@@ -10,7 +10,6 @@ import * as Screens from "@/screens"
 import Config from "@/config"
 import { navigationRef, useBackButtonHandler, useDeepLinks } from "@/navigators/navigationUtilities"
 import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
-import { ComponentProps } from "react"
 import { useAuth } from "@/services/auth/useAuth"
 
 /**
@@ -90,7 +89,8 @@ export const AppStack = observer(function AppStack() {
   )
 })
 
-export interface NavigationProps extends Partial<ComponentProps<typeof NavigationContainer>> {}
+export interface NavigationProps
+  extends Partial<React.ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
 
 export function AppNavigator(props: NavigationProps) {
   const { themeScheme, navigationTheme, setThemeContextOverride, ThemeProvider } =

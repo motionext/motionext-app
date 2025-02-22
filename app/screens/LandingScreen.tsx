@@ -22,7 +22,7 @@ import { useAppTheme } from "@/utils/useAppTheme"
 import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 
 // Services and hooks
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, useNavigation } from "@react-navigation/native"
 import { NavigationProp } from "@react-navigation/native"
 import { useAuth } from "@/services/auth/useAuth"
 
@@ -40,10 +40,12 @@ export const LandingScreen: FC<LandingScreenProps> = observer(function LandingSc
   const handleGoogleSignIn = async () => {
     const success = await signInWithGoogle()
     if (success) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      })
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        }),
+      )
     }
   }
 

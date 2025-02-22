@@ -32,7 +32,6 @@ type Storage = typeof storage
  * use the `useNavigation` with the stack navigator's ParamList type.
  */
 export const navigationRef = createNavigationContainerRef<AppStackParamList>()
-
 /**
  * Gets the current screen from any navigation state.
  * @param {NavigationState | PartialState<NavigationState>} state - The navigation state to traverse.
