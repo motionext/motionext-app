@@ -226,10 +226,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         }
       }
 
-      showMessage({
-        title: translate("auth:errors.cancelled"),
-        type: "error",
-      })
       return false
     } catch (error) {
       reportCrash(error as Error)

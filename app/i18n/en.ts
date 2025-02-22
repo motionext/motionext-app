@@ -39,7 +39,6 @@ const en = {
     resetPasswordSuccessTitle: "Email sent successfully!",
     resetPasswordSuccessDescription: "Check your inbox.",
     errors: {
-      cancelled: "Authentication cancelled",
       userBanned: "This account has been banned",
       invalidCredentials: "Invalid email or password",
       emailNotConfirmed: "Please confirm your email before logging in",
