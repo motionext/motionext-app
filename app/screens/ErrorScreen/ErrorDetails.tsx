@@ -24,7 +24,7 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       contentContainerStyle={themed($contentContainer)}
     >
       <Icon icon="ladybug" size={64} />
-      <Text style={themed($heading)} preset="subheading" tx="errorScreen:title" />
+      <Text style={themed($heading)} preset="subheading" tx="errors:title" />
       <Text style={themed($subtitle)} tx="errorScreen:friendlySubtitle" />
 
       <Button
