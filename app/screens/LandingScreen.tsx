@@ -8,10 +8,9 @@ import { BlurView } from "expo-blur"
 
 // Components
 import { AutoImage } from "@/components/AutoImage"
-import { Button, Screen } from "@/components"
+import { Button, Divider, Screen } from "@/components"
 import { HeaderLogo } from "@/components/HeaderLogo"
 import { Icon } from "@/components/Icon"
-import { Text } from "@/components/Text"
 
 // Navigation
 import { AppStackParamList, AppStackScreenProps } from "@/navigators"
@@ -25,6 +24,7 @@ import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 import { CommonActions, useNavigation } from "@react-navigation/native"
 import { NavigationProp } from "@react-navigation/native"
 import { useAuth } from "@/services/auth/useAuth"
+import { translate } from "@/i18n"
 
 const landingImage = require("../../assets/images/landing-page/background.png")
 
@@ -80,9 +80,7 @@ export const LandingScreen: FC<LandingScreenProps> = observer(function LandingSc
               pressedTextStyle={themed($customButtonTextPressed)}
             />
             <View style={themed($dividerContainer)}>
-              <View style={themed($line)} />
-              <Text tx="landingScreen:or" style={themed($orText)} />
-              <View style={themed($line)} />
+              <Divider text={translate("landingScreen:or")} textType="light" />
             </View>
             <View style={themed($socialButtonsContainer)}>
               <Button
@@ -148,19 +146,6 @@ const $dividerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginVertical: spacing.sm,
   width: "80%",
   alignSelf: "center",
-})
-
-const $line: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flex: 1,
-  height: 1,
-  backgroundColor: colors.border,
-  marginHorizontal: spacing.sm,
-})
-
-const $orText: ThemedStyle<TextStyle> = () => ({
-  color: "#fff",
-  fontSize: 16,
-  fontWeight: "bold",
 })
 
 const $socialButtonsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({

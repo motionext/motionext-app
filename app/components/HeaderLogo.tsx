@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { Image, ImageStyle, View, ViewStyle, TextStyle, StyleProp } from "react-native"
 import { Text } from "@/components"
-import { type ThemedStyle } from "@/theme"
+import type { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 
 interface HeaderLogoProps {
