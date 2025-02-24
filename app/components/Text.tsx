@@ -105,7 +105,7 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
       ...$fontWeightStyles.bold,
     },
   ],
-  subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.medium }],
+  subheading: [$baseStyle, { ...$sizeStyles.xl, ...$fontWeightStyles.medium }],
   formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
   formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
 }
