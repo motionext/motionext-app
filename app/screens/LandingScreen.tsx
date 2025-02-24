@@ -66,6 +66,7 @@ export const LandingScreen: FC<LandingScreenProps> = observer(function LandingSc
           <View style={themed($contentContainer)}>
             <Button
               tx="landingScreen:continueWithMail"
+              colorType="light"
               LeftAccessory={(props) => (
                 <Icon
                   icon="mail"
