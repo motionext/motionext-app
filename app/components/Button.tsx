@@ -13,11 +13,13 @@ import { Text, TextProps } from "@/components/Text"
 import { useAppTheme } from "@/utils/useAppTheme"
 
 type Presets = "default" | "filled" | "reversed"
+type ColorType = "dark" | "light" | "auto"
 
 export interface ButtonAccessoryProps {
   style: StyleProp<any>
   pressableState: PressableStateCallbackType
   disabled?: boolean
+  colorStyle?: StyleProp<TextStyle>
 }
 
 export interface ButtonProps extends PressableProps {
@@ -81,6 +83,13 @@ export interface ButtonProps extends PressableProps {
    * An optional style override for the disabled state
    */
   disabledStyle?: StyleProp<ViewStyle>
+  /**
+   * Defines the text color behavior after pressing
+   * - dark: Forces dark text, left and right icons will be dark
+   * - light: Forces light text, left and right icons will be light
+   * - auto: Automatically chooses based on background (default)
+   */
+  colorType?: ColorType
 }
 
 /**
@@ -110,6 +119,7 @@ export function Button(props: ButtonProps) {
     RightAccessory,
     LeftAccessory,
     disabled,
+    colorType = "auto",
     disabledStyle: $disabledViewStyleOverride,
     ...rest
   } = props
@@ -139,9 +149,22 @@ export function Button(props: ButtonProps) {
     return [
       themed($textPresets[preset]),
       $textStyleOverride,
-      !!pressed && themed([$pressedTextPresets[preset], $pressedTextStyleOverride]),
+      !!pressed &&
+        themed([
+          $pressedTextPresets[preset],
+          $pressedTextStyleOverride,
+          $colorTypePresets[colorType],
+        ]),
       !!disabled && $disabledTextStyleOverride,
     ]
+  }
+
+  /**
+   * Returns the color style based on the current state
+   */
+  function $colorStyle(state: PressableStateCallbackType): StyleProp<TextStyle> {
+    const { pressed } = state
+    return pressed ? themed($colorTypePresets[colorType]) : {}
   }
 
   return (
@@ -155,7 +178,11 @@ export function Button(props: ButtonProps) {
       {(state) => (
         <>
           {!!LeftAccessory && (
-            <LeftAccessory style={$leftAccessoryStyle} pressableState={state} disabled={disabled} />
+            <LeftAccessory
+              style={[$leftAccessoryStyle, $colorStyle(state)]}
+              pressableState={state}
+              disabled={disabled}
+            />
           )}
 
           <Text tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}>
@@ -164,7 +191,7 @@ export function Button(props: ButtonProps) {
 
           {!!RightAccessory && (
             <RightAccessory
-              style={$rightAccessoryStyle}
+              style={[$rightAccessoryStyle, $colorStyle(state)]}
               pressableState={state}
               disabled={disabled}
             />
@@ -176,23 +203,25 @@ export function Button(props: ButtonProps) {
 }
 
 const $baseViewStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  minHeight: 56,
-  borderRadius: 4,
+  minHeight: 48,
+  borderRadius: 12,
   justifyContent: "center",
   alignItems: "center",
   paddingVertical: spacing.sm,
-  paddingHorizontal: spacing.sm,
-  overflow: "hidden",
+  paddingHorizontal: spacing.md,
+  flexDirection: "row",
+  gap: spacing.xs,
 })
 
 const $baseTextStyle: ThemedStyle<TextStyle> = ({ typography }) => ({
-  fontSize: 16,
+  fontSize: 15,
   lineHeight: 20,
-  fontFamily: typography.primary.medium,
+  fontFamily: typography.primary.semiBold,
   textAlign: "center",
   flexShrink: 1,
   flexGrow: 0,
   zIndex: 2,
+  letterSpacing: 0.3,
 })
 
 const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -208,20 +237,34 @@ const $viewPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
     $styles.row,
     $baseViewStyle,
     ({ colors }) => ({
-      borderWidth: 1,
-      borderColor: colors.palette.neutral400,
+      borderWidth: 0,
+      borderColor: colors.palette.neutral300,
       backgroundColor: colors.palette.neutral100,
     }),
   ],
   filled: [
     $styles.row,
     $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral300 }),
+    ({ colors }) => ({
+      backgroundColor: colors.palette.primary500,
+      shadowColor: colors.palette.primary500,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 4,
+    }),
   ],
   reversed: [
     $styles.row,
     $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral800 }),
+    ({ colors }) => ({
+      backgroundColor: colors.palette.neutral900,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 4,
+    }),
   ],
 }
 
@@ -232,9 +275,18 @@ const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
 }
 
 const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
-  default: ({ colors }) => ({ backgroundColor: colors.palette.neutral200 }),
-  filled: ({ colors }) => ({ backgroundColor: colors.palette.neutral400 }),
-  reversed: ({ colors }) => ({ backgroundColor: colors.palette.neutral700 }),
+  default: () => ({
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
+  }),
+  filled: () => ({
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  }),
+  reversed: () => ({
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  }),
 }
 
 const $pressedTextPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
@@ -245,15 +297,28 @@ const $pressedTextPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
 
 const $disabledViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
   default: ({ colors }) => ({
-    backgroundColor: colors.palette.neutral300,
-    opacity: 0.5,
+    backgroundColor: colors.palette.neutral200,
+    borderColor: colors.palette.neutral300,
+    opacity: 0.6,
   }),
   filled: ({ colors }) => ({
-    backgroundColor: colors.palette.neutral500,
-    opacity: 0.5,
+    backgroundColor: colors.palette.neutral400,
+    opacity: 0.6,
   }),
   reversed: ({ colors }) => ({
-    backgroundColor: colors.palette.neutral900,
-    opacity: 0.5,
+    backgroundColor: colors.palette.neutral700,
+    opacity: 0.6,
   }),
+}
+
+const $colorTypePresets: Record<ColorType, ThemedStyle<TextStyle>> = {
+  dark: () => ({
+    color: "#000000",
+    tintColor: "#000000",
+  }),
+  light: () => ({
+    color: "#FFFFFF",
+    tintColor: "#FFFFFF",
+  }),
+  auto: () => ({}), // mantém a cor padrão do preset
 }
