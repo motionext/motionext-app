@@ -32,7 +32,12 @@ export const VerifyEmailScreen: FC<VerifyEmailScreenProps> = observer(function V
         />
 
         <View style={themed($buttonContainer)}>
-          <Button onPress={openEmailApp} tx="verifyEmailScreen:openEmail" preset="filled" />
+          <Button
+            onPress={openEmailApp}
+            tx="verifyEmailScreen:openEmail"
+            preset="reversed"
+            style={themed($button)}
+          />
         </View>
       </View>
     </Screen>
@@ -61,4 +66,9 @@ const $descriptionStyle: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
 const $buttonContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   width: "100%",
   gap: spacing.md,
+})
+
+const $button: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.tint,
+  color: colors.palette.neutral100,
 })
