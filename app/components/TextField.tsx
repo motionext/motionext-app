@@ -241,17 +241,26 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
   )
 })
 
-const $labelStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
+const $labelStyle: ThemedStyle<TextStyle> = ({ spacing, typography }) => ({
   marginBottom: spacing.xs,
+  fontSize: 14,
+  fontFamily: typography.primary.medium,
+  letterSpacing: 0.25,
 })
 
-const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   alignItems: "flex-start",
-  borderWidth: 1,
-  borderRadius: 4,
-  backgroundColor: colors.palette.neutral200,
-  borderColor: colors.palette.neutral400,
+  borderWidth: 1.5,
+  borderRadius: 12,
+  backgroundColor: colors.background,
+  borderColor: colors.palette.neutral300,
   overflow: "hidden",
+  shadowColor: colors.palette.neutral400,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 2,
+  paddingHorizontal: spacing.xs,
 })
 
 const $inputStyle: ThemedStyle<ViewStyle> = ({ colors, typography, spacing }) => ({
@@ -260,16 +269,16 @@ const $inputStyle: ThemedStyle<ViewStyle> = ({ colors, typography, spacing }) =>
   fontFamily: typography.primary.normal,
   color: colors.text,
   fontSize: 16,
-  height: 24,
-  // https://github.com/facebook/react-native/issues/21720#issuecomment-532642093
-  paddingVertical: 0,
-  paddingHorizontal: 0,
-  marginVertical: spacing.xs,
-  marginHorizontal: spacing.sm,
+  height: 40,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.sm,
+  marginVertical: 0,
+  marginHorizontal: 0,
 })
 
 const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginTop: spacing.xs,
+  fontSize: 16,
 })
 
 const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -281,7 +290,7 @@ const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginStart: spacing.xs,
-  height: 40,
+  height: 48,
   justifyContent: "center",
   alignItems: "center",
 })
