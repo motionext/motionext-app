@@ -28,6 +28,7 @@ import { useAuth } from "@/services/auth/useAuth"
 export type AppStackParamList = {
   Welcome: undefined
   SignIn: undefined
+  SignUp: undefined
   VerifyEmail: undefined
   Home: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -58,9 +59,7 @@ export const AppStack = observer(function AppStack() {
     console.log("[AUTH] Auth status:", authStatus)
   }
 
-  if (!initialCheckDone) {
-    return null
-  }
+  if (!initialCheckDone) return null
 
   return (
     <Stack.Navigator
@@ -71,18 +70,21 @@ export const AppStack = observer(function AppStack() {
           backgroundColor: colors.background,
         },
       }}
-      initialRouteName={authStatus === "authenticated" ? "Home" : "Welcome"}
     >
-      {/* Public routes */}
-      <Stack.Screen name="Welcome" component={Screens.LandingScreen} />
-      <Stack.Screen name="SignIn" component={Screens.SignInScreen} />
-      <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
-
-      {authStatus === "authenticated" && (
-        // Authenticated routes
+      {authStatus === "authenticated" ? (
+        // Authenticated stack
+        <Stack.Screen name="Home" component={Screens.HomeScreen} />
+      ) : (
+        // Auth stack
         <>
-          <Stack.Screen name="Home" component={Screens.HomeScreen} />
+          <Stack.Screen name="Welcome" component={Screens.LandingScreen} />
+          <Stack.Group>
+            <Stack.Screen name="SignIn" component={Screens.SignInScreen} />
+            <Stack.Screen name="SignUp" component={Screens.SignUpScreen} />
+          </Stack.Group>
+          <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
+
+          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
         </>
       )}
     </Stack.Navigator>

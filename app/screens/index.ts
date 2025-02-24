@@ -1,5 +1,6 @@
 export * from "./LandingScreen"
 export * from "./ErrorScreen/ErrorBoundary"
-export * from "./SignInScreen"
+export * from "./SignIn"
+export * from "./SignUp"
 export * from "./VerifyEmailScreen"
 export * from "./HomeScreen"
