@@ -119,7 +119,7 @@ const $textField: ViewStyle = {
 
 const $googleButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.background,
-  borderWidth: 1,
+  borderWidth: 0.75,
   borderColor: colors.border,
   maxWidth: "100%",
   minHeight: 50,

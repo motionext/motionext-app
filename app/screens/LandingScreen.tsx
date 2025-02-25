@@ -165,6 +165,7 @@ const $socialButtonStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "center",
+  borderWidth: 0.75,
 })
 
 const $socialButtonText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
