@@ -4,7 +4,7 @@ const en = {
     google: "Google",
   },
   landingScreen: {
-    continueWithEmail: "Continue with Email",
+    continueWithMail: "Continue with Email",
     or: "or continue with",
   },
   errorScreen: {
