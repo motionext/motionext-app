@@ -61,10 +61,6 @@ export interface HeaderProps {
    */
   leftIcon?: IconTypes
   /**
-   * An optional tint color for the left icon
-   */
-  leftIconColor?: string
-  /**
    * Left action text to display if not using `leftTx`.
    * Can be used with `onLeftPress`. Overrides `leftIcon`.
    */
@@ -153,7 +149,6 @@ export function Header(props: HeaderProps) {
     backgroundColor = colors.background,
     LeftActionComponent,
     leftIcon,
-    leftIconColor,
     leftText,
     leftTx,
     leftTxOptions,
@@ -187,7 +182,7 @@ export function Header(props: HeaderProps) {
           tx={leftTx}
           text={leftText}
           icon={leftIcon}
-          iconColor={leftIconColor}
+          iconColor={colors.text}
           onPress={onLeftPress}
           txOptions={leftTxOptions}
           backgroundColor={backgroundColor}
