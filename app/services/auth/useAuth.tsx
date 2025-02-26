@@ -124,8 +124,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
           // If we have a session token but are offline without cache, trust the token
           setToken(session.access_token)
-          // Attempt to extract user information from the token if possible
 
+          // Attempt to extract user information from the token if possible
           const payload = JSON.parse(atob(session.access_token.split(".")[1]))
           if (payload.sub) {
             const cachedUser = { id: payload.sub, email: payload.email }
