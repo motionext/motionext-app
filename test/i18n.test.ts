@@ -127,6 +127,7 @@ describe("i18n", () => {
       const allKeysDefined = collectKeys(en).map((key) => key.replace(".", ":"))
 
       const allKeysUsed = stdout.replace(/"/g, "").split("\n").filter(Boolean)
+      const uniqueKeysUsed = [...new Set(allKeysUsed)]
 
       const missingKeys = allKeysUsed.filter(
         (key) => !CONFIG.exceptions.includes(key) && !allKeysDefined.includes(key),
@@ -137,6 +138,7 @@ describe("i18n", () => {
       let output = `--- i18n Test Results ---\n`
       output += `Total keys defined: ${allKeysDefined.length}\n`
       output += `Total keys used: ${allKeysUsed.length}\n`
+      output += `Unique keys used: ${uniqueKeysUsed.length}\n`
       output += `Missing keys: ${missingKeys.length > 0 ? missingKeys.join(", ") : "None"}\n`
       output += `Unused keys: ${unusedKeys.length > 0 ? unusedKeys.join(", ") : "None"}\n`
       output += `-------------------------\n`
