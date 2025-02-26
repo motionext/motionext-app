@@ -105,11 +105,25 @@ const pt = {
   settings: {
     title: "Configurações",
     themeSelector: {
-      title: "Tema da aplicação",
+      title: "Tema da Aplicação",
       light: "Claro",
       dark: "Escuro",
-      auto: "Auto",
+      auto: "Sistema",
     },
+    dataModal: {
+      title: "Dados Armazenados",
+      emptyState: "Sem dados armazenados",
+    },
+    clearAllData: {
+      buttonText: "Limpar Todos os Dados",
+      title: "Confirmação",
+      message: "Tem certeza que deseja limpar todos os dados?",
+      deleteButton: "Apagar",
+      successTitle: "Sucesso",
+      successMessage: "Todos os dados foram apagados",
+      cancelButton: "Cancelar",
+    },
+    viewAllData: "Ver Todos os Dados",
   },
 }
 

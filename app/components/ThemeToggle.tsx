@@ -17,9 +17,7 @@ export const ThemeToggle: FC<ThemeToggleProps> = ({ style }) => {
   }
 
   return (
-    <View style={[themed($container), style]}>
-      <Text tx="settings:themeSelector.title" style={themed($title)} />
-
+    <View style={style}>
       <View style={themed($optionsContainer)}>
         <TouchableOpacity
           style={[themed($option), themePreference === "light" && themed($selectedOption)]}
@@ -73,18 +71,6 @@ export const ThemeToggle: FC<ThemeToggleProps> = ({ style }) => {
     </View>
   )
 }
-
-const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  padding: spacing.md,
-  marginVertical: spacing.sm,
-})
-
-const $title: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-  fontSize: 16,
-  fontWeight: "bold",
-  marginBottom: spacing.sm,
-  color: colors.text,
-})
 
 const $optionsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",

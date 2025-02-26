@@ -107,8 +107,22 @@ const en = {
       title: "Application Theme",
       light: "Light",
       dark: "Dark",
-      auto: "Automatic",
+      auto: "System",
     },
+    dataModal: {
+      title: "Stored Data",
+      emptyState: "No data available",
+    },
+    clearAllData: {
+      buttonText: "Clear All Data",
+      title: "Confirmation",
+      message: "Are you sure you want to delete all data?",
+      deleteButton: "Delete",
+      successTitle: "Success",
+      successMessage: "All data has been deleted",
+      cancelButton: "Cancel",
+    },
+    viewAllData: "View All Data",
   },
 }
 
