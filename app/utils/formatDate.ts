@@ -45,6 +45,11 @@ export const loadDateFnsLocale = () => {
   }
 }
 
+// Add a listener for language changes
+i18n.on("languageChanged", () => {
+  loadDateFnsLocale()
+})
+
 export const formatDate = (date: string, dateFormat?: string, options?: Options) => {
   const dateOptions = {
     ...options,

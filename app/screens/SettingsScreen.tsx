@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 import { View, ViewStyle, Alert, TextStyle } from "react-native"
 import { observer } from "mobx-react-lite"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
@@ -6,8 +6,10 @@ import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { Screen, ThemeToggle, Button, Header, Text } from "@/components"
 import { Icon } from "@/components/Icon"
 import { DataModal } from "@/components/DataModal"
+import { LanguageToggle } from "@/components/LanguageToggle"
 
 import { useAppTheme } from "@/utils/useAppTheme"
+import { languageEventEmitter } from "@/i18n/i18n"
 
 import { useAuth } from "@/services/auth/useAuth"
 
@@ -22,11 +24,25 @@ export const SettingsScreen: FC = observer(function SettingsScreen() {
   const { themed, theme } = useAppTheme()
   const { signOut } = useAuth()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+  const [, forceUpdate] = useState({})
 
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   const [isModalVisible, setModalVisible] = useState(false)
   const [storedData, setStoredData] = useState("")
+
+  // Listen for language change events
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      forceUpdate({})
+    }
+
+    languageEventEmitter.on("languageChanged", handleLanguageChange)
+
+    return () => {
+      languageEventEmitter.off("languageChanged", handleLanguageChange)
+    }
+  }, [])
 
   const handleViewAllData = () => {
     const data = getAllStoredData()
@@ -70,7 +86,16 @@ export const SettingsScreen: FC = observer(function SettingsScreen() {
         </View>
 
         <View style={themed($section)}>
-          <Text text="Dados" preset="subheading" style={themed($sectionTitle)} />
+          <Text
+            tx="settings:languageSelector.title"
+            preset="subheading"
+            style={themed($sectionTitle)}
+          />
+          <LanguageToggle />
+        </View>
+
+        <View style={themed($section)}>
+          <Text tx="settings:data" preset="subheading" style={themed($sectionTitle)} />
           <View style={themed($buttonGroup)}>
             <Button
               tx="settings:viewAllData"

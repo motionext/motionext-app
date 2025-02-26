@@ -109,6 +109,11 @@ const en = {
       dark: "Dark",
       auto: "System",
     },
+    languageSelector: {
+      title: "Application Language",
+      en: "English",
+      pt: "Portuguese",
+    },
     dataModal: {
       title: "Stored Data",
       emptyState: "No data available",
@@ -122,6 +127,7 @@ const en = {
       successMessage: "All data has been deleted",
       cancelButton: "Cancel",
     },
+    data: "Data",
     viewAllData: "View All Data",
   },
 }

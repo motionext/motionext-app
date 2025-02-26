@@ -110,6 +110,11 @@ const pt = {
       dark: "Escuro",
       auto: "Sistema",
     },
+    languageSelector: {
+      title: "Idioma da Aplicação",
+      en: "Inglês",
+      pt: "Português",
+    },
     dataModal: {
       title: "Dados Armazenados",
       emptyState: "Sem dados armazenados",
@@ -123,6 +128,7 @@ const pt = {
       successMessage: "Todos os dados foram apagados",
       cancelButton: "Cancelar",
     },
+    data: "Dados",
     viewAllData: "Ver Todos os Dados",
   },
 }

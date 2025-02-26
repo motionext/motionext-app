@@ -5,6 +5,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller"
 import * as Linking from "expo-linking"
 import * as SplashScreen from "expo-splash-screen"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import i18n from "i18next"
 
 import { AppNavigator, useNavigationPersistence } from "@/navigators"
 import { AuthProvider } from "@/services/auth/useAuth"
@@ -50,6 +51,15 @@ export function App() {
     initI18n()
       .then(() => setIsI18nInitialized(true))
       .then(() => loadDateFnsLocale())
+
+    // Add listener for language changes
+    i18n.on("languageChanged", () => {
+      loadDateFnsLocale()
+    })
+
+    return () => {
+      i18n.off("languageChanged")
+    }
   }, [])
 
   // Initialize the Sentry crash reporting system to monitor and log application errors
