@@ -1,27 +1,60 @@
-import { FC } from "react"
+import { FC, useState, useEffect } from "react"
 import { ScrollView, View, Image, ViewStyle, ImageStyle, ActivityIndicator } from "react-native"
 import { Button, TextField, Divider } from "@/components"
 import { translate } from "@/i18n"
 import type { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import type { SignUpFormProps } from "../types"
+import { PasswordStrengthMeter, PasswordStrength } from "@/components/PasswordStrengthMeter"
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated"
 
 const googleIcon = require("../../../../assets/icons/google.png")
 
 export const SignUpForm: FC<SignUpFormProps> = ({
+  firstName,
+  lastName,
   email,
   password,
   isPasswordHidden,
   validationErrors,
   isSigningUp,
+  onFirstNameChange,
+  onLastNameChange,
   onEmailChange,
   onPasswordChange,
   onSubmit,
   onGoogleSignIn,
   passwordInput,
+  lastNameInput,
+  emailInput,
   PasswordRightAccessory,
 }) => {
-  const { themed } = useAppTheme()
+  const { themed, theme } = useAppTheme()
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>("weak")
+
+  // Animated value to control the transition
+  const buttonAnimationProgress = useSharedValue(0)
+
+  // Updates the animation value when the password strength changes
+  useEffect(() => {
+    buttonAnimationProgress.value = withTiming(passwordStrength === "excellent" ? 1 : 0, {
+      duration: 500,
+    })
+  }, [passwordStrength, buttonAnimationProgress])
+
+  // Animated style for the button
+  const animatedButtonStyle = useAnimatedStyle(() => {
+    const backgroundColor =
+      passwordStrength === "excellent"
+        ? withTiming(theme.colors.tint, { duration: 300 })
+        : withTiming(theme.colors.palette.neutral400, { duration: 300 })
+
+    return {
+      backgroundColor,
+    }
+  })
+
+  const isSubmitDisabled = isSigningUp || passwordStrength !== "excellent"
 
   return (
     <ScrollView
@@ -36,14 +69,47 @@ export const SignUpForm: FC<SignUpFormProps> = ({
           preset="filled"
           style={themed($googleButton)}
           LeftAccessory={() => <Image source={googleIcon} style={themed($googleIcon)} />}
-          text="Google"
+          text={translate("common:google")}
           onPress={onGoogleSignIn}
         />
 
         <Divider text={translate("landingScreen:or")} />
 
         <View style={themed($formFields)}>
+          {/* First Name and Last Name on the same line */}
+          <View style={themed($rowContainer)}>
+            <TextField
+              containerStyle={[themed($textField), themed($halfWidth)]}
+              label={translate("auth:signUp.firstName")}
+              autoCapitalize="words"
+              autoComplete="name-given"
+              autoCorrect={false}
+              value={firstName}
+              onChangeText={onFirstNameChange}
+              status={validationErrors.get("firstName") ? "error" : undefined}
+              helper={validationErrors.get("firstName")}
+              onSubmitEditing={() => lastNameInput.current?.focus()}
+              returnKeyType="next"
+            />
+
+            <TextField
+              ref={lastNameInput}
+              containerStyle={[themed($textField), themed($halfWidth)]}
+              label={translate("auth:signUp.lastName")}
+              autoCapitalize="words"
+              autoComplete="name-family"
+              autoCorrect={false}
+              value={lastName}
+              onChangeText={onLastNameChange}
+              status={validationErrors.get("lastName") ? "error" : undefined}
+              helper={validationErrors.get("lastName")}
+              onSubmitEditing={() => emailInput.current?.focus()}
+              returnKeyType="next"
+            />
+          </View>
+
           <TextField
+            ref={emailInput}
             containerStyle={themed($textField)}
             label={translate("auth:signUp.email")}
             autoCapitalize="none"
@@ -74,21 +140,26 @@ export const SignUpForm: FC<SignUpFormProps> = ({
             returnKeyType="done"
             RightAccessory={PasswordRightAccessory}
           />
+          <PasswordStrengthMeter password={password} onStrengthChange={setPasswordStrength} />
 
-          <Button
-            tx="auth:signUp.button"
-            preset="reversed"
-            style={themed($button)}
-            onPress={onSubmit}
-            disabled={isSigningUp}
-            RightAccessory={() =>
-              isSigningUp ? (
-                <View style={themed($spinnerContainer)}>
-                  <ActivityIndicator size="small" color={themed($spinnerColor)} />
-                </View>
-              ) : null
-            }
-          />
+          <View style={themed($buttonWrapper)}>
+            <Animated.View style={[animatedButtonStyle, themed($buttonContainer)]}>
+              <Button
+                tx="auth:signUp.button"
+                preset="reversed"
+                style={themed($button)}
+                onPress={onSubmit}
+                disabled={isSubmitDisabled}
+                RightAccessory={() =>
+                  isSigningUp ? (
+                    <View style={themed($spinnerContainer)}>
+                      <ActivityIndicator size="small" color={themed($spinnerColor)} />
+                    </View>
+                  ) : null
+                }
+              />
+            </Animated.View>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -113,16 +184,28 @@ const $formFields: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   gap: spacing.md,
 })
 
+const $rowContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  gap: spacing.sm,
+})
+
+const $halfWidth: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+})
+
 const $textField: ViewStyle = {
   minHeight: 85,
 }
 
-const $googleButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $googleButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.background,
   borderWidth: 0.75,
   borderColor: colors.border,
   maxWidth: "100%",
   minHeight: 50,
+  borderRadius: 8,
+  marginBottom: spacing.xs,
 })
 
 const $googleIcon: ThemedStyle<ImageStyle> = ({ spacing }) => ({
@@ -137,7 +220,17 @@ const $spinnerContainer: ViewStyle = {
 
 const $spinnerColor = "#fff"
 
-const $button: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  backgroundColor: colors.tint,
-  color: colors.palette.neutral100,
+const $button: ThemedStyle<ViewStyle> = () => ({
+  backgroundColor: "transparent",
+})
+
+const $buttonContainer: ThemedStyle<ViewStyle> = () => ({
+  borderRadius: 8,
+  overflow: "hidden",
+})
+
+const $buttonWrapper: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginTop: spacing.sm,
+  borderRadius: 8,
+  overflow: "hidden",
 })

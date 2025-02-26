@@ -42,6 +42,39 @@ export const SignInScreen: FC = observer(function SignInScreen() {
 
   const passwordInput = useRef<TextInput>(null)
 
+  const validateField = useCallback((field: "email" | "password", value: string): boolean => {
+    try {
+      signInSchema.shape[field].parse(value)
+      setValidationErrors((prev) => {
+        const next = new Map(prev)
+        next.delete(field)
+        return next
+      })
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setValidationErrors((prev) => {
+          const next = new Map(prev)
+          error.errors.forEach((err) => {
+            next.set(field, err.message)
+          })
+          return next
+        })
+      }
+      return false
+    }
+  }, [])
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    validateField("email", value)
+  }
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value)
+    validateField("password", value)
+  }
+
   const validateForm = useCallback(() => {
     const result = signInSchema.safeParse({ email, password })
     if (!result.success) {
@@ -185,8 +218,8 @@ export const SignInScreen: FC = observer(function SignInScreen() {
             isPasswordHidden={isPasswordHidden}
             validationErrors={validationErrors}
             isSigningIn={isSigningIn}
-            onEmailChange={setEmail}
-            onPasswordChange={setPassword}
+            onEmailChange={handleEmailChange}
+            onPasswordChange={handlePasswordChange}
             onSubmit={onSignIn}
             onForgotPassword={onForgotPassword}
             onGoogleSignIn={onGoogleSignIn}

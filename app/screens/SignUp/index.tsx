@@ -21,11 +21,39 @@ import { colors, ThemedStyle } from "@/theme"
 import { SignUpHeader, SignUpForm, SignUpFooter } from "./components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import type { ValidationErrors } from "./types"
+import { save } from "@/utils/storage"
 
+// Esquema de validação mais robusto com Zod
 const signUpSchema = z.object({
-  email: z.string().email(translate("auth:errors.invalidEmail")),
-  password: z.string().min(1, translate("auth:errors.passwordRequired")),
+  firstName: z
+    .string()
+    .min(1, translate("auth:errors.firstNameRequired"))
+    .max(50, translate("auth:errors.firstNameTooLong"))
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, translate("auth:errors.invalidFirstName"))
+    .transform((val) => val.trim()),
+
+  lastName: z
+    .string()
+    .min(1, translate("auth:errors.lastNameRequired"))
+    .max(50, translate("auth:errors.lastNameTooLong"))
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, translate("auth:errors.invalidLastName"))
+    .transform((val) => val.trim()),
+
+  email: z
+    .string()
+    .min(1, translate("auth:errors.emailRequired"))
+    .max(100, translate("auth:errors.emailTooLong"))
+    .email(translate("auth:errors.invalidEmail"))
+    .transform((val) => val.toLowerCase().trim()),
+
+  password: z
+    .string()
+    .min(8, translate("auth:errors.passwordTooShort"))
+    .max(100, translate("auth:errors.passwordTooLong")),
 })
+
+// Tipo para os dados validados
+type SignUpFormData = z.infer<typeof signUpSchema>
 
 export const SignUpScreen: FC = observer(function SignUpScreen() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -33,42 +61,108 @@ export const SignUpScreen: FC = observer(function SignUpScreen() {
   const { isKeyboardVisible } = useKeyboard()
   const { themed } = useAppTheme()
 
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isPasswordHidden, setIsPasswordHidden] = useState(true)
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(new Map())
   const [isSigningUp, setIsSigningUp] = useState(false)
 
+  const lastNameInput = useRef<TextInput>(null)
+  const emailInput = useRef<TextInput>(null)
   const passwordInput = useRef<TextInput>(null)
 
-  const validateForm = useCallback(() => {
-    const result = signUpSchema.safeParse({ email, password })
-    if (!result.success) {
-      const errors: Map<string, string> = new Map()
-      result.error.errors.forEach((err) => {
-        const field = err.path[0] as string
-        errors.set(field, err.message)
+  const validateField = useCallback((field: keyof SignUpFormData, value: string): boolean => {
+    try {
+      signUpSchema.shape[field].parse(value)
+      setValidationErrors((prev) => {
+        const next = new Map(prev)
+        next.delete(field)
+        return next
       })
-      setValidationErrors(errors)
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setValidationErrors((prev) => {
+          const next = new Map(prev)
+          error.errors.forEach((err) => {
+            next.set(field, err.message)
+          })
+          return next
+        })
+      }
       return false
     }
-    setValidationErrors(new Map())
-    return true
-  }, [email, password])
+  }, [])
+
+  const validateForm = useCallback((): SignUpFormData | null => {
+    try {
+      const result = signUpSchema.parse({
+        firstName,
+        lastName,
+        email,
+        password,
+      })
+      setValidationErrors(new Map())
+      return result
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors = new Map<string, string>()
+        error.errors.forEach((err) => {
+          const field = err.path[0] as string
+          newErrors.set(field, err.message)
+        })
+        setValidationErrors(newErrors)
+      }
+      return null
+    }
+  }, [firstName, lastName, email, password])
+
+  const handleFirstNameChange = (value: string) => {
+    setFirstName(value)
+    validateField("firstName", value)
+  }
+
+  const handleLastNameChange = (value: string) => {
+    setLastName(value)
+    validateField("lastName", value)
+  }
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    validateField("email", value)
+  }
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value)
+    validateField("password", value)
+  }
 
   const onSignUp = async () => {
-    if (!validateForm()) return
+    const validatedData = validateForm()
+    if (!validatedData) return
 
     try {
       setIsSigningUp(true)
-      const { error } = await signUp({
-        email: email.toLowerCase(),
-        password,
+      const { data, error } = await signUp({
+        email: validatedData.email,
+        password: validatedData.password,
       })
 
       if (error) {
         setValidationErrors(new Map([["global", error.message]]))
         return
+      }
+
+      // If the sign-up was successful and we have a user, save the profile
+      if (data.user) {
+        await save("pendingProfile", {
+          userId: data.user.id,
+          firstName: validatedData.firstName,
+          lastName: validatedData.lastName,
+          email: validatedData.email,
+        })
       }
 
       navigation.navigate("VerifyEmail")
@@ -135,16 +229,22 @@ export const SignUpScreen: FC = observer(function SignUpScreen() {
         <View style={themed($content)}>
           <SignUpHeader />
           <SignUpForm
+            firstName={firstName}
+            lastName={lastName}
             email={email}
             password={password}
             isPasswordHidden={isPasswordHidden}
             validationErrors={validationErrors}
             isSigningUp={isSigningUp}
-            onEmailChange={setEmail}
-            onPasswordChange={setPassword}
+            onFirstNameChange={handleFirstNameChange}
+            onLastNameChange={handleLastNameChange}
+            onEmailChange={handleEmailChange}
+            onPasswordChange={handlePasswordChange}
             onSubmit={onSignUp}
             onGoogleSignIn={onGoogleSignIn}
             passwordInput={passwordInput}
+            lastNameInput={lastNameInput}
+            emailInput={emailInput}
             PasswordRightAccessory={PasswordRightAccessory}
           />
         </View>
