@@ -164,7 +164,8 @@ export function useNavigationPersistence(storage: Storage, persistenceKey: strin
   }
 
   useEffect(() => {
-    if (!isRestored) restoreState()
+    //! if (!isRestored) restoreState()
+    if (isMounted()) setIsRestored(true)
     // runs once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

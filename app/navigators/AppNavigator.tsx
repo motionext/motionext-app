@@ -56,7 +56,7 @@ export const AppStack = observer(function AppStack() {
   const { authStatus, initialCheckDone } = useAuth()
 
   if (__DEV__) {
-    console.log("[AUTH] Auth status:", authStatus)
+    console.log("[AUTH] Auth status:", authStatus, "Initial check done:", initialCheckDone)
   }
 
   if (!initialCheckDone) return null
