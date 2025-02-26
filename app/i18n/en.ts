@@ -2,6 +2,8 @@ const en = {
   common: {
     ok: "OK",
     google: "Google",
+    connectedToInternet: "Connected to internet",
+    noInternetConnection: "No internet connection",
   },
   landingScreen: {
     continueWithMail: "Continue with Email",
@@ -34,6 +36,7 @@ const en = {
   },
   home: {
     logout: "Sign Out",
+    settings: "Settings",
   },
   auth: {
     resetPassword: "Forgot Password?",
@@ -96,6 +99,15 @@ const en = {
       uppercase: "Include an uppercase letter",
       number: "Include a number",
       perfect: "Excellent password! 🔒",
+    },
+  },
+  settings: {
+    title: "Settings",
+    themeSelector: {
+      title: "Application Theme",
+      light: "Light",
+      dark: "Dark",
+      auto: "Automatic",
     },
   },
 }

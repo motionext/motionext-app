@@ -2,6 +2,8 @@ const pt = {
   common: {
     ok: "OK",
     google: "Google",
+    connectedToInternet: "Conectado à internet",
+    noInternetConnection: "Sem conexão com a internet",
   },
   landingScreen: {
     continueWithMail: "Continuar com o email",
@@ -35,6 +37,7 @@ const pt = {
   },
   home: {
     logout: "Terminar sessão",
+    settings: "Configurações",
   },
   auth: {
     resetPassword: "Esqueceu-se da palavra-passe?",
@@ -97,6 +100,15 @@ const pt = {
       uppercase: "Adicione uma letra maiúscula",
       number: "Adicione um número",
       perfect: "Senha excelente! 🔒",
+    },
+  },
+  settings: {
+    title: "Configurações",
+    themeSelector: {
+      title: "Tema da aplicação",
+      light: "Claro",
+      dark: "Escuro",
+      auto: "Auto",
     },
   },
 }

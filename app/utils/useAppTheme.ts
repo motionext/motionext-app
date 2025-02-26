@@ -11,18 +11,27 @@ import {
 } from "@/theme"
 import * as SystemUI from "expo-system-ui"
 import { reportCrash } from "./crashReporting"
+import { storage } from "@/utils/storage"
 
 type ThemeContextType = {
   themeScheme: ThemeContexts
   setThemeContextOverride: (newTheme: ThemeContexts) => void
+  themePreference: ThemeContexts
+  setThemePreference: (preference: ThemeContexts) => void
 }
 
 // create a React context and provider for the current theme
 export const ThemeContext = createContext<ThemeContextType>({
-  themeScheme: undefined, // default to the system theme
+  themeScheme: undefined,
   setThemeContextOverride: (_newTheme: ThemeContexts) => {
     reportCrash(
       new Error("Tried to call setThemeContextOverride before the ThemeProvider was initialized"),
+    )
+  },
+  themePreference: undefined,
+  setThemePreference: (_preference: ThemeContexts) => {
+    reportCrash(
+      new Error("Tried to call setThemePreference before the ThemeProvider was initialized"),
     )
   },
 })
@@ -37,9 +46,40 @@ const setImperativeTheming = (theme: Theme) => {
 export const useThemeProvider = (initialTheme: ThemeContexts = undefined) => {
   const colorScheme = useColorScheme()
   const [overrideTheme, setTheme] = useState<ThemeContexts>(initialTheme)
+  const [themePreference, setThemePreferenceState] = useState<ThemeContexts>(undefined)
+
+  useEffect(() => {
+    const loadThemePreference = async () => {
+      const savedPreference = storage.getString("themePreference") as ThemeContexts | undefined
+      if (savedPreference) {
+        setThemePreferenceState(savedPreference)
+        if (savedPreference !== undefined) {
+          setTheme(savedPreference)
+        }
+      }
+    }
+
+    loadThemePreference()
+  }, [])
 
   const setThemeContextOverride = useCallback((newTheme: ThemeContexts) => {
     setTheme(newTheme)
+  }, [])
+
+  const setThemePreference = useCallback((preference: ThemeContexts) => {
+    setThemePreferenceState(preference)
+
+    if (preference) {
+      storage.set("themePreference", preference)
+    } else {
+      storage.delete("themePreference")
+    }
+
+    if (preference !== undefined) {
+      setTheme(preference)
+    } else {
+      setTheme(undefined)
+    }
   }, [])
 
   const themeScheme = overrideTheme || colorScheme || "light"
@@ -53,6 +93,8 @@ export const useThemeProvider = (initialTheme: ThemeContexts = undefined) => {
     themeScheme,
     navigationTheme,
     setThemeContextOverride,
+    themePreference,
+    setThemePreference,
     ThemeProvider: ThemeContext.Provider,
   }
 }
@@ -66,6 +108,10 @@ interface UseAppThemeValue {
   theme: Theme
   // The current theme context "light" | "dark"
   themeContext: ThemeContexts
+  // The current theme preference "light" | "dark" | undefined (auto)
+  themePreference: ThemeContexts
+  // A function to set the theme preference
+  setThemePreference: (preference: ThemeContexts) => void
   // A function to apply the theme to a style object.
   themed: <T>(styleOrStyleFn: ThemedStyle<T> | StyleProp<T> | ThemedStyleArray<T>) => T
 }
@@ -83,7 +129,12 @@ export const useAppTheme = (): UseAppThemeValue => {
     throw new Error("useTheme must be used within a ThemeProvider")
   }
 
-  const { themeScheme: overrideTheme, setThemeContextOverride } = context
+  const {
+    themeScheme: overrideTheme,
+    setThemeContextOverride,
+    themePreference,
+    setThemePreference,
+  } = context
 
   const themeContext: ThemeContexts = useMemo(
     () => overrideTheme || (navTheme.dark ? "dark" : "light"),
@@ -115,5 +166,7 @@ export const useAppTheme = (): UseAppThemeValue => {
     theme: themeVariant,
     themeContext,
     themed,
+    themePreference,
+    setThemePreference,
   }
 }

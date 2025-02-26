@@ -17,8 +17,9 @@ import { getAuthErrorMessage } from "@/services/auth/errors"
 import { showMessage } from "@/utils/showMessage"
 import { translate } from "@/i18n"
 import { userService } from "@/services/user/userService"
-import { load, remove } from "@/utils/storage"
+import { load, remove, save } from "@/utils/storage"
 import { PendingProfile } from "@/screens/SignUp/types"
+import { useConnectivity } from "@/utils/connectivity"
 
 type AuthState = {
   isAuthenticated: boolean
@@ -76,57 +77,178 @@ export function useAuth() {
   return value
 }
 
+// Define an interface for the cached authentication object
+interface CachedAuth {
+  user: User
+  token: string
+}
+
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<AuthState["token"]>(undefined)
   const [initialCheckDone, setInitialCheckDone] = useState(false)
   const [authStatus, setAuthStatus] = useState<"signIn" | "authenticated">("signIn")
+  const { isConnected } = useConnectivity()
 
-  const updateAuthState = useCallback(async (session: Session | null) => {
-    try {
-      if (!session?.access_token) {
+  const updateAuthState = useCallback(
+    async (session: Session | null) => {
+      try {
+        if (!session?.access_token) {
+          // Check for cached credentials if disconnected
+          if (!isConnected) {
+            const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+            if (cachedAuth?.user && cachedAuth?.token) {
+              setToken(cachedAuth.token)
+              setUser(cachedAuth.user)
+              setAuthStatus("authenticated")
+              return
+            }
+          }
+
+          setToken(undefined)
+          setUser(null)
+          setAuthStatus("signIn")
+          return
+        }
+
+        // If offline, do not attempt to validate the token - trust what we already have
+        if (!isConnected) {
+          const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+          if (cachedAuth?.user && cachedAuth?.token) {
+            // If we have cache, use it directly
+            setToken(cachedAuth.token)
+            setUser(cachedAuth.user)
+            setAuthStatus("authenticated")
+            return
+          }
+
+          // If we have a session token but are offline without cache, trust the token
+          setToken(session.access_token)
+          // Attempt to extract user information from the token if possible
+
+          const payload = JSON.parse(atob(session.access_token.split(".")[1]))
+          if (payload.sub) {
+            const cachedUser = { id: payload.sub, email: payload.email }
+            setUser(cachedUser as User)
+            // Save in cache for future use
+            await save("cachedAuth", {
+              user: cachedUser,
+              token: session.access_token,
+            } as CachedAuth)
+          }
+
+          setAuthStatus("authenticated")
+          return
+        }
+
+        // If online, proceed normally with token verification
+        try {
+          const {
+            data: { user },
+            error,
+          } = await supabase.auth.getUser(session.access_token)
+
+          if (error || !user?.email_confirmed_at) {
+            // If offline, try to use cached credentials before logging out
+            if (!isConnected) {
+              const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+              if (cachedAuth?.user && cachedAuth?.token) {
+                setToken(cachedAuth.token)
+                setUser(cachedAuth.user)
+                setAuthStatus("authenticated")
+                return
+              }
+            }
+
+            setToken(undefined)
+            setUser(null)
+            setAuthStatus("signIn")
+            return
+          }
+
+          // Save user and token to local storage for offline use
+          await save("cachedAuth", { user, token: session.access_token } as CachedAuth)
+
+          setToken(session.access_token)
+          setUser(user)
+          setAuthStatus("authenticated")
+        } catch (error) {
+          // If it's likely a network error and we're offline
+          if (!isConnected) {
+            const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+            if (cachedAuth?.user && cachedAuth?.token) {
+              setToken(cachedAuth.token)
+              setUser(cachedAuth.user)
+              setAuthStatus("authenticated")
+              return
+            }
+          }
+
+          reportCrash(error as Error)
+          setToken(undefined)
+          setUser(null)
+          setAuthStatus("signIn")
+        }
+      } catch (error) {
+        // If it's likely a network error and we're offline
+        if (!isConnected) {
+          const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+          if (cachedAuth?.user && cachedAuth?.token) {
+            setToken(cachedAuth.token)
+            setUser(cachedAuth.user)
+            setAuthStatus("authenticated")
+            return
+          }
+        }
+
+        reportCrash(error as Error)
         setToken(undefined)
         setUser(null)
         setAuthStatus("signIn")
-        return
       }
-
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser(session.access_token)
-
-      if (error || !user?.email_confirmed_at) {
-        setToken(undefined)
-        setUser(null)
-        setAuthStatus("signIn")
-        return
-      }
-
-      setToken(session.access_token)
-      setUser(user)
-      setAuthStatus("authenticated")
-    } catch (error) {
-      reportCrash(error as Error)
-      setToken(undefined)
-      setUser(null)
-      setAuthStatus("signIn")
-    }
-  }, [])
+    },
+    [isConnected],
+  )
 
   useEffect(() => {
     let isMounted = true
 
     const initialize = async () => {
       try {
+        // First try to load from cache
+        const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+
+        // Try getting a fresh session
         const {
           data: { session },
         } = await supabase.auth.getSession()
+
         if (isMounted) {
-          await updateAuthState(session)
+          if (session) {
+            await updateAuthState(session)
+          } else if (!isConnected && cachedAuth?.user && cachedAuth?.token) {
+            // If offline and no session but we have cached auth, use it
+            setToken(cachedAuth.token)
+            setUser(cachedAuth.user)
+            setAuthStatus("authenticated")
+          } else {
+            setAuthStatus("signIn")
+          }
           setInitialCheckDone(true)
         }
       } catch (error) {
+        // If error is likely due to being offline
+        if (!isConnected) {
+          const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
+          if (cachedAuth?.user && cachedAuth?.token && isMounted) {
+            setToken(cachedAuth.token)
+            setUser(cachedAuth.user)
+            setAuthStatus("authenticated")
+            setInitialCheckDone(true)
+            return
+          }
+        }
+
         reportCrash(error as Error)
         if (isMounted) {
           setInitialCheckDone(true)
@@ -149,7 +271,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [updateAuthState])
+  }, [updateAuthState, isConnected])
 
   const signIn = async ({ email, password }: SignInProps) => {
     try {
@@ -179,6 +301,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
+    await remove("cachedAuth") // Clear cached auth on sign out
   }, [])
 
   const handleDeepLinkSignIn = useCallback(

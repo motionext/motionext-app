@@ -31,6 +31,7 @@ export type AppStackParamList = {
   SignUp: undefined
   VerifyEmail: undefined
   Home: undefined
+  Settings: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -55,8 +56,8 @@ export const AppStack = observer(function AppStack() {
 
   const { authStatus, initialCheckDone } = useAuth()
 
-  if (__DEV__) {
-    console.log("[AUTH] Auth status:", authStatus, "Initial check done:", initialCheckDone)
+  if (__DEV__ && initialCheckDone) {
+    console.log("[AUTH] Auth status:", authStatus)
   }
 
   if (!initialCheckDone) return null
@@ -73,7 +74,10 @@ export const AppStack = observer(function AppStack() {
     >
       {authStatus === "authenticated" ? (
         // Authenticated stack
-        <Stack.Screen name="Home" component={Screens.HomeScreen} />
+        <>
+          <Stack.Screen name="Home" component={Screens.HomeScreen} />
+          <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
+        </>
       ) : (
         // Auth stack
         <>
@@ -95,14 +99,27 @@ export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
 
 export function AppNavigator(props: NavigationProps) {
-  const { themeScheme, navigationTheme, setThemeContextOverride, ThemeProvider } =
-    useThemeProvider()
+  const {
+    themeScheme,
+    navigationTheme,
+    setThemeContextOverride,
+    themePreference,
+    setThemePreference,
+    ThemeProvider,
+  } = useThemeProvider()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
   useDeepLinks() // Watch for deep links appearing
 
   return (
-    <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
+    <ThemeProvider
+      value={{
+        themeScheme,
+        setThemeContextOverride,
+        themePreference,
+        setThemePreference,
+      }}
+    >
       <NavigationContainer ref={navigationRef} theme={navigationTheme} {...props}>
         <AppStack />
       </NavigationContainer>
