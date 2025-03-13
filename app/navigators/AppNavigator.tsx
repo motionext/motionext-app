@@ -3,14 +3,20 @@
  * Generally, include an auth flow (registration, login, forgot password)
  * and a "main" flow to use once logged in.
  */
+import { useEffect, useState } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
-import * as Screens from "@/screens"
+
 import Config from "@/config"
+import * as Screens from "@/screens"
 import { navigationRef, useBackButtonHandler, useDeepLinks } from "@/navigators/navigationUtilities"
-import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
+
 import { useAuth } from "@/services/auth/useAuth"
+import { Onboarding } from "@/components/Onboarding"
+
+import { storage } from "@/utils/storage"
+import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -87,8 +93,7 @@ export const AppStack = observer(function AppStack() {
             <Stack.Screen name="SignUp" component={Screens.SignUpScreen} />
           </Stack.Group>
           <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
-
-          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}{" "}
         </>
       )}
     </Stack.Navigator>
@@ -108,6 +113,17 @@ export function AppNavigator(props: NavigationProps) {
     ThemeProvider,
   } = useThemeProvider()
 
+  // Onboarding drawer bottom - is shown if the user has not seen it yet
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    const hasSeenOnboarding = storage.getString("hasSeenOnboarding")
+
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true)
+    }
+  }, [])
+
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
   useDeepLinks() // Watch for deep links appearing
 
@@ -121,7 +137,10 @@ export function AppNavigator(props: NavigationProps) {
       }}
     >
       <NavigationContainer ref={navigationRef} theme={navigationTheme} {...props}>
-        <AppStack />
+        <>
+          <AppStack />
+          <Onboarding isVisible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
+        </>
       </NavigationContainer>
     </ThemeProvider>
   )

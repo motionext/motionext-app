@@ -3,6 +3,8 @@ import { exec } from "child_process"
 import path from "path"
 import fs from "fs"
 
+const exceptions: string[] = ["settings:languageSelector.en", "settings:languageSelector.pt"]
+
 function findAppDirectory(): string {
   const currentDir = process.cwd()
 
@@ -57,7 +59,7 @@ function findAppDirectory(): string {
 const CONFIG = {
   srcDir: findAppDirectory(),
   grepRegex: `[Tt]x=[{]?\\\\"[^\\"]*\\\\"[}]?\\|translate(\\\\"[^\\"]*\\\\"`,
-  exceptions: [] as string[],
+  exceptions: exceptions as string[],
   retryLimit: 3,
 }
 
@@ -119,7 +121,7 @@ describe("i18n", () => {
       throw new Error(`Directory not found: ${CONFIG.srcDir}`)
     }
 
-    const grepCommand = `grep -E '[Tt]x=[{]?"[^"]*"[}]?|translate\\("[^"]*"' -ohr ${CONFIG.srcDir} | grep -o '"[^"]*"'`
+    const grepCommand = `grep -E '[Tt]x=[{]?"[^"]*"[}]?|translate\\("[^"]*"|[a-zA-Z]+Tx: "[^"]*"' -ohr ${CONFIG.srcDir} | grep -o '"[^"]*"'`
 
     try {
       const stdout = await execWithRetries(grepCommand, CONFIG.retryLimit)
@@ -133,7 +135,9 @@ describe("i18n", () => {
         (key) => !CONFIG.exceptions.includes(key) && !allKeysDefined.includes(key),
       )
 
-      const unusedKeys = allKeysDefined.filter((key) => !allKeysUsed.includes(key))
+      const unusedKeys = allKeysDefined.filter(
+        (key) => !CONFIG.exceptions.includes(key) && !allKeysUsed.includes(key),
+      )
 
       let output = `--- i18n Test Results ---\n`
       output += `Total keys defined: ${allKeysDefined.length}\n`

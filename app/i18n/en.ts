@@ -5,6 +5,41 @@ const en = {
     connectedToInternet: "Connected to internet",
     noInternetConnection: "No internet connection",
   },
+  onboarding: {
+    overview: {
+      title: "Welcome to Motionext!",
+      description:
+        "Swipe through to discover all the features that will elevate your health and wellness.",
+    },
+    meal_plan: {
+      title: "Eat smart!",
+      description: "Plan your meals and stay on top of a balanced diet.",
+    },
+    workout_plan: {
+      title: "Your workout, your pace!",
+      description: "Follow personalized plans to reach your goals.",
+    },
+    liquid_intake: {
+      title: "Stay hydrated!",
+      description: "Track your liquid intake and boost your performance.",
+    },
+    intermittent_fasting: {
+      title: "Take control of your fasting!",
+      description: "Set schedules and track your progress.",
+    },
+    mental_health: {
+      title: "Healthy mind, healthy body!",
+      description: "Exercises and practices to reduce stress and improve your well-being.",
+    },
+    cardiology: {
+      title: "Keep your heart in check!",
+      description: "Log your blood pressure and monitor your heart health.",
+    },
+    medication: {
+      title: "Never miss a dose!",
+      description: "Set reminders and stay on top of your medication.",
+    },
+  },
   landingScreen: {
     continueWithMail: "Continue with Email",
     or: "or continue with",

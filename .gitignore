@@ -51,7 +51,7 @@ buck-out/
 .vscode
 
 # Expo
-.expo/*
+.expo/
 bin/Exponent.app
 /android
 /ios
@@ -84,3 +84,5 @@ bun.lock
 # env
 .env.*
 !.env.template
+
+.cursor/

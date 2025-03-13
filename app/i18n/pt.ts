@@ -5,6 +5,41 @@ const pt = {
     connectedToInternet: "Conectado à internet",
     noInternetConnection: "Sem conexão com a internet",
   },
+  onboarding: {
+    overview: {
+      title: "Bem-vindo ao Motionext!",
+      description:
+        "Desliza para conhecer todas as funcionalidades que vão transformar a tua saúde e bem-estar.",
+    },
+    meal_plan: {
+      title: "Alimenta-te de forma inteligente!",
+      description: "Planeia as tuas refeições e mantém uma dieta equilibrada.",
+    },
+    workout_plan: {
+      title: "O teu treino, o teu ritmo!",
+      description: "Segue planos personalizados para atingir os teus objetivos.",
+    },
+    liquid_intake: {
+      title: "Mantém-te hidratado!",
+      description: "Regista a tua ingestão de líquidos e melhora o teu desempenho.",
+    },
+    intermittent_fasting: {
+      title: "Controla o teu jejum!",
+      description: "Define horários e acompanha os teus progressos.",
+    },
+    mental_health: {
+      title: "Mente sã, corpo são!",
+      description: "Exercícios e práticas para reduzir o stress e melhorar o teu bem-estar.",
+    },
+    cardiology: {
+      title: "Mantém o coração sob controlo!",
+      description: "Regista a tua pressão arterial e monitoriza a tua saúde cardíaca.",
+    },
+    medication: {
+      title: "Nunca te esqueças dos teus medicamentos!",
+      description: "Define lembretes e mantém o teu tratamento em dia.",
+    },
+  },
   landingScreen: {
     continueWithMail: "Continuar com o email",
     or: "ou continue com",
