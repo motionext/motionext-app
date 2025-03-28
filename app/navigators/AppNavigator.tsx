@@ -93,7 +93,7 @@ export const AppStack = observer(function AppStack() {
             <Stack.Screen name="SignUp" component={Screens.SignUpScreen} />
           </Stack.Group>
           <Stack.Screen name="VerifyEmail" component={Screens.VerifyEmailScreen} />
-          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}{" "}
+          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
         </>
       )}
     </Stack.Navigator>
