@@ -11,7 +11,7 @@ import { observer } from "mobx-react-lite"
 import { CommonActions, NavigationProp, useNavigation } from "@react-navigation/native"
 import { z } from "zod"
 
-import { Icon, Screen } from "@/components"
+import { PressableIcon, Screen } from "@/components"
 import { AppStackParamList } from "@/navigators"
 import { useAuth } from "@/services/auth/useAuth"
 import { useKeyboard } from "@/utils/useKeyboard"
@@ -181,7 +181,7 @@ export const SignInScreen: FC = observer(function SignInScreen() {
 
   const PasswordRightAccessory = useCallback(
     (props: any) => (
-      <Icon
+      <PressableIcon
         style={themed($eyeIcon)}
         icon={isPasswordHidden ? "view" : "hidden"}
         color={colors.palette.neutral800}

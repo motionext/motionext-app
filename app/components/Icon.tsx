@@ -1,4 +1,3 @@
-import { ComponentType } from "react"
 import {
   Image,
   ImageStyle,
@@ -9,10 +8,11 @@ import {
   ViewProps,
   ViewStyle,
 } from "react-native"
+import { useAppTheme } from "@/utils/useAppTheme"
 
 export type IconTypes = keyof typeof iconRegistry
 
-interface IconProps extends TouchableOpacityProps {
+type BaseIconProps = {
   /**
    * The name of the icon
    */
@@ -37,16 +37,46 @@ interface IconProps extends TouchableOpacityProps {
    * Style overrides for the icon container
    */
   containerStyle?: StyleProp<ViewStyle>
+}
 
-  /**
-   * An optional function to be called when the icon is pressed
-   */
-  onPress?: TouchableOpacityProps["onPress"]
+type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps
+type IconProps = Omit<ViewProps, "style"> & BaseIconProps
+
+/**
+ * A component to render a registered icon.
+ * It is wrapped in a <TouchableOpacity />
+ * @param {PressableIconProps} props - The props for the `PressableIcon` component.
+ * @returns {JSX.Element} The rendered `PressableIcon` component.
+ */
+export function PressableIcon(props: PressableIconProps) {
+  const {
+    icon,
+    color,
+    size,
+    style: $imageStyleOverride,
+    containerStyle: $containerStyleOverride,
+    ...pressableProps
+  } = props
+
+  const { theme } = useAppTheme()
+
+  const $imageStyle: StyleProp<ImageStyle> = [
+    $imageStyleBase,
+    { tintColor: color ?? theme.colors.text },
+    size !== undefined && { width: size, height: size },
+    $imageStyleOverride,
+  ]
+
+  return (
+    <TouchableOpacity {...pressableProps} style={$containerStyleOverride}>
+      <Image style={$imageStyle} source={iconRegistry[icon]} />
+    </TouchableOpacity>
+  )
 }
 
 /**
  * A component to render a registered icon.
- * It is wrapped in a <TouchableOpacity /> if `onPress` is provided, otherwise a <View />.
+ * It is wrapped in a <View />, use `PressableIcon` if you want to react to input
  * @param {IconProps} props - The props for the `Icon` component.
  * @returns {JSX.Element} The rendered `Icon` component.
  */
@@ -57,29 +87,22 @@ export function Icon(props: IconProps) {
     size,
     style: $imageStyleOverride,
     containerStyle: $containerStyleOverride,
-    ...WrapperProps
+    ...viewProps
   } = props
 
-  const isPressable = !!WrapperProps.onPress
-  const Wrapper = (WrapperProps?.onPress ? TouchableOpacity : View) as ComponentType<
-    TouchableOpacityProps | ViewProps
-  >
+  const { theme } = useAppTheme()
 
   const $imageStyle: StyleProp<ImageStyle> = [
     $imageStyleBase,
-    { tintColor: color },
+    { tintColor: color ?? theme.colors.text },
     size !== undefined && { width: size, height: size },
     $imageStyleOverride,
   ]
 
   return (
-    <Wrapper
-      accessibilityRole={isPressable ? "imagebutton" : undefined}
-      {...WrapperProps}
-      style={$containerStyleOverride}
-    >
+    <View {...viewProps} style={$containerStyleOverride}>
       <Image style={$imageStyle} source={iconRegistry[icon]} />
-    </Wrapper>
+    </View>
   )
 }
 
