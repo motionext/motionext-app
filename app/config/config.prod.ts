@@ -6,6 +6,5 @@
  * https://reactnative.dev/docs/security#storing-sensitive-info
  */
 export default {
-  // TODO: Change the API url
-  API_URL: "CHANGEME",
+  API_URL: "https://api.rss2json.com/v1",
 }
