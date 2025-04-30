@@ -3,7 +3,7 @@
  * Generally, include an auth flow (registration, login, forgot password)
  * and a "main" flow to use once logged in.
  */
-import { useEffect, useState } from "react"
+import { ComponentProps, useEffect, useState } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
@@ -101,7 +101,7 @@ export const AppStack = observer(function AppStack() {
 })
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
+  extends Partial<ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
 
 export function AppNavigator(props: NavigationProps) {
   const {
