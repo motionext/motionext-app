@@ -21,7 +21,6 @@ import { colors, ThemedStyle } from "@/theme"
 import { SignUpHeader, SignUpForm, SignUpFooter } from "./components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import type { ValidationErrors } from "./types"
-import { save } from "@/utils/storage"
 
 // Esquema de validação mais robusto com Zod
 const signUpSchema = z.object({
@@ -145,7 +144,7 @@ export const SignUpScreen: FC = observer(function SignUpScreen() {
 
     try {
       setIsSigningUp(true)
-      const { data, error } = await signUp({
+      const { error } = await signUp({
         email: validatedData.email,
         password: validatedData.password,
       })
@@ -153,16 +152,6 @@ export const SignUpScreen: FC = observer(function SignUpScreen() {
       if (error) {
         setValidationErrors(new Map([["global", error.message]]))
         return
-      }
-
-      // If the sign-up was successful and we have a user, save the profile
-      if (data.user) {
-        await save("pendingProfile", {
-          userId: data.user.id,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
-          email: validatedData.email,
-        })
       }
 
       navigation.navigate("VerifyEmail")

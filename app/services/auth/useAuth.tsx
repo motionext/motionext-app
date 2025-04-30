@@ -16,9 +16,7 @@ import { reportCrash } from "@/utils/crashReporting"
 import { getAuthErrorMessage } from "@/services/auth/errors"
 import { showMessage } from "@/utils/showMessage"
 import { translate } from "@/i18n"
-import { userService } from "@/services/user/userService"
 import { load, remove, save } from "@/utils/storage"
-import { PendingProfile } from "@/screens/SignUp/types"
 import { useConnectivity } from "@/utils/connectivity"
 
 type AuthState = {
@@ -309,25 +307,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       if (session?.access_token) {
         await updateAuthState(session)
 
-        // Check for a pending profile
-        const pendingProfile = (await load("pendingProfile")) as PendingProfile | null
-        if (pendingProfile) {
-          try {
-            await userService.createProfile({
-              userId: pendingProfile.userId,
-              firstName: pendingProfile.firstName,
-              lastName: pendingProfile.lastName,
-              email: pendingProfile.email,
-              signupToken: pendingProfile.userId,
-            })
-          } catch (error) {
-            reportCrash(error as Error)
-          } finally {
-            // Clear the temporary data
-            await remove("pendingProfile")
-          }
-        }
-
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -367,21 +346,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         if (session) {
           const { session: authSession } = session
           await updateAuthState(authSession)
-
-          // Create the user profile
-          if (session.user) {
-            await userService.createProfile({
-              userId: session.user.id,
-              firstName:
-                userInfo.data.user.givenName || userInfo.data.user.name?.split(" ")[0] || "",
-              lastName:
-                userInfo.data.user.familyName ||
-                userInfo.data.user.name?.split(" ").slice(1).join(" ") ||
-                "",
-              email: session.user.email || "",
-              signupToken: session.user.id,
-            })
-          }
 
           setAuthStatus("authenticated")
           return true

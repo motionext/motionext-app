@@ -31,10 +31,3 @@ export interface UserProfile {
   created_at: string
   updated_at: string
 }
-
-export interface PendingProfile {
-  userId: string
-  firstName: string
-  lastName: string
-  email: string
-}
