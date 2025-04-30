@@ -22,7 +22,8 @@
       },
       "splash": {
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "allowBackup": false
     },
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
