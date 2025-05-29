@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect } from "react"
-import { Dimensions, ViewStyle, ImageStyle, TextStyle, View } from "react-native"
+import { Dimensions, ViewStyle, ImageStyle, TextStyle, View, StatusBar } from "react-native"
 import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import Animated, {
   useAnimatedStyle,
@@ -124,38 +124,42 @@ export const Onboarding = ({ isVisible, onDismiss }: OnboardingProps) => {
   }, [isVisible])
 
   return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        index={0}
-        onChange={handleSheetChanges}
-        handleIndicatorStyle={themed($handle)}
-        backgroundStyle={{
-          backgroundColor: theme.colors.background,
-        }}
-      >
-        <BottomSheetView style={themed($contentContainer)}>
-          <AnimatedScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={scrollHandler}
-            scrollEventThrottle={16}
-            decelerationRate="fast"
-            style={themed($scrollView)}
-          >
-            {onboardingSteps.map((page, index) => (
-              <OnboardingPage key={index} page={page} index={index} scrollX={scrollX} />
-            ))}
-          </AnimatedScrollView>
-          <View style={themed($paginationContainer)}>
-            {onboardingSteps.map((_, index) => (
-              <OnboardingDot key={index} index={index} scrollX={scrollX} />
-            ))}
-          </View>
-        </BottomSheetView>
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
+    <>
+      <StatusBar translucent />
+
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          index={0}
+          onChange={handleSheetChanges}
+          handleIndicatorStyle={themed($handle)}
+          backgroundStyle={{
+            backgroundColor: theme.colors.background,
+          }}
+        >
+          <BottomSheetView style={themed($contentContainer)}>
+            <AnimatedScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={scrollHandler}
+              scrollEventThrottle={16}
+              decelerationRate="fast"
+              style={themed($scrollView)}
+            >
+              {onboardingSteps.map((page, index) => (
+                <OnboardingPage key={index} page={page} index={index} scrollX={scrollX} />
+              ))}
+            </AnimatedScrollView>
+            <View style={themed($paginationContainer)}>
+              {onboardingSteps.map((_, index) => (
+                <OnboardingDot key={index} index={index} scrollX={scrollX} />
+              ))}
+            </View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    </>
   )
 }
 
@@ -233,10 +237,11 @@ const $paginationDot: ThemedStyle<ViewStyle> = ({ colors }) => ({
   overflow: "hidden",
 })
 
-const $welcomeTitle: ThemedStyle<TextStyle> = () => ({
-  marginVertical: 15,
-  fontSize: 48,
-  lineHeight: 56,
+const $welcomeTitle: ThemedStyle<TextStyle> = ({ spacing }) => ({
+  marginVertical: spacing.md,
+  fontSize: Math.min(48, SCREEN_WIDTH * 0.12),
+  lineHeight: Math.min(56, SCREEN_WIDTH * 0.14),
+  textAlign: "center",
 })
 
 const $welcomeDescription: ThemedStyle<TextStyle> = () => ({
