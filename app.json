@@ -23,7 +23,8 @@
       "splash": {
         "backgroundColor": "#FFFFFF"
       },
-      "allowBackup": false
+      "allowBackup": false,
+      "edgeToEdgeEnabled": true
     },
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",

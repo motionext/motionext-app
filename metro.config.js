@@ -17,5 +17,6 @@ config.transformer.getTransformOptions = async () => ({
 // This helps support certain popular third-party libraries
 // such as Firebase that use the extension cjs.
 config.resolver.sourceExts.push("cjs")
+config.resolver.unstable_enablePackageExports = false // TODO: Remove on the next supabase-js update
 
 module.exports = config
