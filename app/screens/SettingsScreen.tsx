@@ -7,15 +7,11 @@ import { Screen, ThemeToggle, Button, Header, Text } from "@/components"
 import { Icon } from "@/components/Icon"
 import { DataModal } from "@/components/DataModal"
 import { LanguageToggle } from "@/components/LanguageToggle"
-
 import { useAppTheme } from "@/utils/useAppTheme"
 import { languageEventEmitter } from "@/i18n/i18n"
-
 import { useAuth } from "@/services/auth/useAuth"
-
 import { $styles, ThemedStyle } from "@/theme"
 import { AppStackParamList } from "@/navigators"
-
 import { getAllStoredData, clearAllStoredData } from "@/utils/storageUtils"
 import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 import { translate } from "@/i18n"

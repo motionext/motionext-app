@@ -1,10 +1,12 @@
 import { View, ViewStyle, TextStyle } from "react-native"
 import Animated, { withSpring, useAnimatedStyle } from "react-native-reanimated"
-import { Text } from "./Text"
+import { FC, useEffect } from "react"
+
 import type { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { translate } from "@/i18n"
-import { FC, useEffect } from "react"
+
+import { Text } from "./Text"
 
 export type PasswordStrength = "weak" | "medium" | "strong" | "excellent"
 

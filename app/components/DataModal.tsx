@@ -2,6 +2,7 @@ import { FC } from "react"
 import { Modal, View, FlatList, TouchableOpacity, ViewStyle, TextStyle } from "react-native"
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated"
 import { BlurView } from "expo-blur"
+
 import { useAppTheme } from "@/utils/useAppTheme"
 import { Icon, Text } from "@/components"
 import { ThemedStyle } from "@/theme"

@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { Header, HeaderProps } from "@/components"
 import { Platform } from "react-native"
+
+import { Header, HeaderProps } from "@/components"
 
 /**
  * A hook that can be used to easily set the Header of a react-navigation screen from within the screen's component.
@@ -30,6 +31,5 @@ export function useHeader(
       header: () => <Header {...headerProps} />,
     })
     // intentionally created API to have user set when they want to update the header via `deps`
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, navigation])
 }

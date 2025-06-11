@@ -1,7 +1,8 @@
 import { FC } from "react"
 import { Platform, TextStyle, View, ViewStyle } from "react-native"
-import { Text } from "@/components"
 import { StackActions, useNavigation } from "@react-navigation/native"
+
+import { Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { type ThemedStyle } from "@/theme"
 import { openLinkInBrowser } from "@/utils/openLinkInBrowser"

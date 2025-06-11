@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
+
 import { RootStore, RootStoreModel } from "../RootStore"
+
 import { setupRootStore } from "./setupRootStore"
 
 /**
@@ -71,7 +73,6 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
       if (_unsubscribe !== undefined) _unsubscribe()
     }
     // only runs on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return { rootStore, rehydrated }

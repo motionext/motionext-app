@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native"
+
 import type { TxKeyPath } from "@/i18n"
 
 // Importe as imagens localmente

@@ -6,11 +6,9 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $styles, ThemedStyle } from "@/theme"
 import { AppStackParamList } from "@/navigators"
 import { Button, Screen, Text } from "@/components"
-
 import { useAuth } from "@/services/auth/useAuth"
 import { userService } from "@/services/user/userService"
 import { useConnectivity } from "@/utils/connectivity"
-
 import { useAppTheme } from "@/utils/useAppTheme"
 import { UserProfile } from "@/screens/SignUp/types"
 

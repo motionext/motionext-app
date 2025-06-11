@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { Image, ImageStyle, View, ViewStyle, TextStyle, StyleProp } from "react-native"
+
 import { Text } from "@/components"
 import type { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
@@ -26,7 +27,6 @@ export const HeaderLogo: FC<HeaderLogoProps> = ({ style, tintColor }) => {
         <Text
           text="MOTIONEXT"
           preset="heading"
-          // eslint-disable-next-line react-native/no-color-literals, react-native/no-inline-styles
           style={[themed($title), { color: tintColor === "light" ? "#000" : "#fff" }]}
         />
       </View>

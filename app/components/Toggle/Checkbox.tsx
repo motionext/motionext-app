@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from "react"
 import { Image, ImageStyle, Animated, StyleProp, View, ViewStyle } from "react-native"
+
 import { $styles } from "@/theme"
 import { iconRegistry, IconTypes } from "@/components/Icon"
 import {

@@ -1,5 +1,6 @@
 import NetInfo from "@react-native-community/netinfo"
 import { z } from "zod"
+
 import { load, save } from "@/utils/storage"
 import { UserProfile } from "@/screens/SignUp/types"
 import { supabase } from "@/services/auth/supabase"

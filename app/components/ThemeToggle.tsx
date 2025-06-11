@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { View, ViewStyle, TouchableOpacity, TextStyle } from "react-native"
+
 import { useAppTheme } from "@/utils/useAppTheme"
 import { Text } from "@/components/Text"
 import { Icon } from "@/components/Icon"

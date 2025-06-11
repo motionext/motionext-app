@@ -1,5 +1,7 @@
 import { Linking, Alert } from "react-native"
+
 import { translate } from "@/i18n"
+
 import { reportCrash } from "./crashReporting"
 
 export async function openEmailApp() {

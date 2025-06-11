@@ -7,6 +7,7 @@ import {
   TextStyle,
   ViewStyle,
 } from "react-native"
+
 import type { ThemedStyle, ThemedStyleArray } from "@/theme"
 import { $styles } from "@/theme"
 import { Text, TextProps } from "@/components/Text"
@@ -289,7 +290,7 @@ const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
   }),
 }
 
-const $pressedTextPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
+const $pressedTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
   default: () => ({ opacity: 0.9 }),
   filled: () => ({ opacity: 0.9 }),
   reversed: () => ({ opacity: 0.9 }),

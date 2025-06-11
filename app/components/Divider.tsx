@@ -1,8 +1,10 @@
 import { FC } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
-import { Text } from "./Text"
+
 import type { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
+
+import { Text } from "./Text"
 
 interface DividerProps {
   text?: string

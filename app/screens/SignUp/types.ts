@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-restricted-imports
 import { TextInput } from "react-native"
+
 import { TextFieldAccessoryProps } from "@/components"
 
 export interface ValidationErrors extends Map<string, string> {}

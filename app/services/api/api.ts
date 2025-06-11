@@ -3,7 +3,9 @@
  * data and process it using this Api class.
  */
 import { ApisauceInstance, create } from "apisauce"
+
 import Config from "../../config"
+
 import type { ApiConfig } from "./api.types"
 
 /**

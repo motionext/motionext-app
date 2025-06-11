@@ -1,8 +1,9 @@
+import { EventEmitter } from "events"
+
 import * as Localization from "expo-localization"
 import { I18nManager } from "react-native"
 import { initReactI18next } from "react-i18next"
 import i18n from "i18next"
-import { EventEmitter } from "events"
 import "intl-pluralrules"
 
 import { storage } from "@/utils/storage"

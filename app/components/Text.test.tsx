@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react-native"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
+
 import { Text } from "./Text"
 
 /* This is an example component test using react-native-testing-library. For more

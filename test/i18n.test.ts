@@ -1,7 +1,8 @@
-import en from "../app/i18n/en"
 import { exec } from "child_process"
 import path from "path"
 import fs from "fs"
+
+import en from "../app/i18n/en"
 
 const exceptions: string[] = ["settings:languageSelector.en", "settings:languageSelector.pt"]
 

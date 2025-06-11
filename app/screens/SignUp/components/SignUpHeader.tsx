@@ -1,6 +1,7 @@
 import { FC } from "react"
 import { View, Image, ViewStyle, ImageStyle, TextStyle } from "react-native"
 import { useWindowDimensions } from "react-native"
+
 import { Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import type { ThemedStyle } from "@/theme"

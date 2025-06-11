@@ -1,13 +1,14 @@
 import { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { View, ViewStyle } from "react-native"
+import { NavigationProp } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
+
 import { AppStackParamList, AppStackScreenProps } from "@/navigators"
 import { Screen, Text, Button, Header } from "@/components"
 import { EmailVerificationIcon } from "@/components/icons/EmailVerificationIcon"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { $styles, type ThemedStyle } from "@/theme"
-import { NavigationProp } from "@react-navigation/native"
-import { useNavigation } from "@react-navigation/native"
 import { openEmailApp } from "@/utils/openEmailApp"
 
 interface VerifyEmailScreenProps extends AppStackScreenProps<"VerifyEmail"> {}

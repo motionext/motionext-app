@@ -2,6 +2,7 @@ import { ComponentType, forwardRef, Ref, useImperativeHandle, useRef } from "rea
 import {
   ImageStyle,
   StyleProp,
+  // eslint-disable-next-line no-restricted-imports
   TextInput,
   TextInputProps,
   TextStyle,
@@ -9,11 +10,13 @@ import {
   View,
   ViewStyle,
 } from "react-native"
+
 import { isRTL, translate } from "@/i18n"
 import type { ThemedStyle, ThemedStyleArray } from "@/theme"
 import { $styles } from "@/theme"
-import { Text, TextProps } from "@/components/Text"
 import { useAppTheme } from "@/utils/useAppTheme"
+
+import { Text, TextProps } from "./Text"
 
 export interface TextFieldAccessoryProps {
   style: StyleProp<ViewStyle | TextStyle | ImageStyle>

@@ -8,13 +8,15 @@ import Animated, {
   useSharedValue,
   Extrapolate,
 } from "react-native-reanimated"
+
 import { onboardingSteps } from "@/config/onboarding"
 import { useAppTheme } from "@/utils/useAppTheme"
-import { AutoImage } from "./AutoImage"
 import { Text } from "@/components"
 import type { ThemedStyle } from "@/theme"
 import { storage } from "@/utils/storage"
 import { translate, type TxKeyPath } from "@/i18n"
+
+import { AutoImage } from "./AutoImage"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window")
 const AnimatedScrollView = Animated.createAnimatedComponent(Animated.ScrollView)
