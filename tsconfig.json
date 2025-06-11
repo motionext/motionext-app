@@ -5,7 +5,7 @@
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "module": "es2015",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
