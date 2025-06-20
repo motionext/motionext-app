@@ -19,10 +19,30 @@ import * as Sentry from "@sentry/react-native"
 
 // Place crash reporting service initialization code to call in `./app/app.tsx`
 export const initCrashReporting = () => {
-  Sentry.init({
-    dsn: "https://64d556e47d64b3c848597eb6fded7e73@o4508539657715712.ingest.de.sentry.io/4508539660206160",
-    debug: false, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
-  })
+  const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN
+
+  if (!sentryDsn && __DEV__) {
+    console.warn("[CRASH REPORTING] Sentry DSN not configured")
+    return
+  }
+
+  if (sentryDsn) {
+    Sentry.init({
+      dsn: sentryDsn,
+      debug: __DEV__, // Enable debug only in development
+      environment: __DEV__ ? "development" : "production",
+      beforeSend(event, hint) {
+        // Filter out sensitive information
+        if (event.exception) {
+          const error = hint.originalException
+          if (error instanceof Error && error.message.includes("password")) {
+            return null // Don't send errors containing password info
+          }
+        }
+        return event
+      },
+    })
+  }
   // Bugsnag.start("API_KEY")
 }
 

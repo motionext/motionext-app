@@ -27,11 +27,28 @@ export const storage = new MMKV({
 // List of keys that contain sensitive data and should be stored in SecureStore
 const SECURE_KEYS = ["cachedAuth", "password", "credentials", "token", "api_key"]
 
+// List of keys that should NOT be cleared during a general clear operation
+const PROTECTED_KEYS = [
+  "session-encryption-key", // Encryption key for MMKV
+  "hasSeenOnboarding", // User onboarding state
+  "themePreference", // User theme preference
+  "languagePreference", // User language preference
+  "biometricEnabled", // Biometric authentication setting
+  "crashReportingConsent", // User consent for crash reporting
+]
+
 /**
  * Checks if a key should be stored in SecureStore
  */
 const isSecureKey = (key: string): boolean => {
   return SECURE_KEYS.some((secureKey) => key.includes(secureKey))
+}
+
+/**
+ * Checks if a key should be protected from general clear operations
+ */
+const isProtectedKey = (key: string): boolean => {
+  return PROTECTED_KEYS.includes(key) || key.startsWith("secure_ref_")
 }
 
 /**
@@ -181,16 +198,144 @@ export function remove(key: string): void {
 }
 
 /**
- * Clears all storage.
+ * Clears all storage except protected keys.
+ * Use clearAll() for complete cleanup including protected keys.
  */
 export function clear(): void {
   try {
-    // Clear MMKV
+    if (__DEV__) {
+      console.log("[STORAGE] Performing selective clear (protecting system keys)")
+    }
+
+    // Get all keys from MMKV
+    const allKeys = storage.getAllKeys()
+
+    // Clear only non-protected keys
+    allKeys.forEach((key) => {
+      if (!isProtectedKey(key)) {
+        storage.delete(key)
+      }
+    })
+
+    // Clear SecureStore for sensitive keys (except protected ones)
+    SECURE_KEYS.forEach((key) => {
+      if (!isProtectedKey(key)) {
+        removeSecure(key).catch(() => {})
+      }
+    })
+
+    if (__DEV__) {
+      console.log(
+        `[STORAGE] Cleared ${allKeys.length - PROTECTED_KEYS.length} keys, protected ${PROTECTED_KEYS.length} system keys`,
+      )
+    }
+  } catch (error) {
+    reportCrash(error as Error)
+  }
+}
+
+/**
+ * Clears ALL storage including protected keys.
+ * Use this only for complete app reset or uninstall scenarios.
+ * @param includeEncryptionKey - Whether to also clear the encryption key (will require app restart)
+ */
+export function clearAll(includeEncryptionKey: boolean = false): void {
+  try {
+    if (__DEV__) {
+      console.warn("[STORAGE] Performing complete clear (including protected keys)")
+    }
+
+    // Clear MMKV completely
     storage.clearAll()
 
-    // Clear SecureStore for sensitive keys
-    SECURE_KEYS.forEach((key) => {
+    // Clear all SecureStore items
+    const allKeysToRemove = [...SECURE_KEYS, ...PROTECTED_KEYS]
+
+    if (!includeEncryptionKey) {
+      // Keep the encryption key to avoid requiring app restart
+      const encryptionKeyIndex = allKeysToRemove.indexOf("session-encryption-key")
+      if (encryptionKeyIndex > -1) {
+        allKeysToRemove.splice(encryptionKeyIndex, 1)
+      }
+    }
+
+    allKeysToRemove.forEach((key) => {
       removeSecure(key).catch(() => {})
     })
-  } catch {}
+
+    if (__DEV__) {
+      console.warn(
+        `[STORAGE] Complete clear performed. Encryption key ${includeEncryptionKey ? "included" : "preserved"}`,
+      )
+    }
+  } catch (error) {
+    reportCrash(error as Error)
+  }
+}
+
+/**
+ * Securely wipes sensitive authentication data
+ */
+export function clearAuthData(): void {
+  try {
+    if (__DEV__) {
+      console.log("[STORAGE] Clearing authentication data")
+    }
+
+    const authKeys = ["cachedAuth", "password", "credentials", "token", "api_key", "biometricToken"]
+
+    authKeys.forEach((key) => {
+      // Remove from MMKV
+      storage.delete(key)
+      storage.delete(`secure_ref_${key}`)
+
+      // Remove from SecureStore
+      removeSecure(key).catch(() => {})
+    })
+
+    if (__DEV__) {
+      console.log("[STORAGE] Authentication data cleared")
+    }
+  } catch (error) {
+    reportCrash(error as Error)
+  }
+}
+
+/**
+ * Get storage usage statistics (for debugging and monitoring)
+ */
+export function getStorageStats(): {
+  mmkvKeys: number
+  secureKeys: number
+  protectedKeys: number
+  totalSize: number
+} {
+  try {
+    const allKeys = storage.getAllKeys()
+    const secureKeyCount = allKeys.filter((key) => key.startsWith("secure_ref_")).length
+    const protectedKeyCount = allKeys.filter((key) => isProtectedKey(key)).length
+
+    // Calculate approximate size (MMKV doesn't provide exact size)
+    let totalSize = 0
+    allKeys.forEach((key) => {
+      const value = storage.getString(key)
+      if (value) {
+        totalSize += value.length
+      }
+    })
+
+    return {
+      mmkvKeys: allKeys.length,
+      secureKeys: secureKeyCount,
+      protectedKeys: protectedKeyCount,
+      totalSize,
+    }
+  } catch {
+    return {
+      mmkvKeys: 0,
+      secureKeys: 0,
+      protectedKeys: 0,
+      totalSize: 0,
+    }
+  }
 }

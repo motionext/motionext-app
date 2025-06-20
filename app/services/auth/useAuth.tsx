@@ -79,6 +79,45 @@ export function useAuth() {
 interface CachedAuth {
   user: User
   token: string
+  expiresAt: number // Add expiration timestamp
+}
+
+/**
+ * Validates JWT token structure and expiration
+ */
+const isValidJWTToken = (token: string): boolean => {
+  try {
+    const parts = token.split(".")
+    if (parts.length !== 3) return false
+
+    const payload = JSON.parse(atob(parts[1]))
+    const currentTime = Math.floor(Date.now() / 1000)
+
+    // Check if token is expired (with 5 minute buffer)
+    if (payload.exp && payload.exp < currentTime + 300) {
+      return false
+    }
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Extracts user info from JWT token safely
+ */
+const extractUserFromToken = (token: string): Partial<User> | null => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return {
+      id: payload.sub,
+      email: payload.email,
+      email_confirmed_at: payload.email_confirmed_at,
+    }
+  } catch {
+    return null
+  }
 }
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -95,11 +134,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           // Check for cached credentials if disconnected
           if (!isConnected) {
             const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
-            if (cachedAuth?.user && cachedAuth?.token) {
-              setToken(cachedAuth.token)
-              setUser(cachedAuth.user)
-              setAuthStatus("authenticated")
-              return
+            if (cachedAuth?.user && cachedAuth?.token && cachedAuth.expiresAt > Date.now()) {
+              // Validate cached token
+              if (isValidJWTToken(cachedAuth.token)) {
+                setToken(cachedAuth.token)
+                setUser(cachedAuth.user)
+                setAuthStatus("authenticated")
+                return
+              } else {
+                // Remove invalid cached auth
+                remove("cachedAuth")
+              }
             }
           }
 
@@ -109,33 +154,51 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           return
         }
 
-        // If offline, do not attempt to validate the token - trust what we already have
+        // Validate token structure
+        if (!isValidJWTToken(session.access_token)) {
+          if (__DEV__) {
+            console.warn("[AUTH] Invalid JWT token structure")
+          }
+          setToken(undefined)
+          setUser(null)
+          setAuthStatus("signIn")
+          return
+        }
+
+        // If offline, use cached auth with token validation
         if (!isConnected) {
           const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
-          if (cachedAuth?.user && cachedAuth?.token) {
-            // If we have cache, use it directly
-            setToken(cachedAuth.token)
-            setUser(cachedAuth.user)
+          if (cachedAuth?.user && cachedAuth?.token && cachedAuth.expiresAt > Date.now()) {
+            if (isValidJWTToken(cachedAuth.token)) {
+              setToken(cachedAuth.token)
+              setUser(cachedAuth.user)
+              setAuthStatus("authenticated")
+              return
+            }
+          }
+
+          // If no valid cache, try to extract user from current token
+          const userFromToken = extractUserFromToken(session.access_token)
+          if (userFromToken) {
+            setToken(session.access_token)
+            setUser(userFromToken as User)
             setAuthStatus("authenticated")
+
+            // Save to cache with expiration
+            const payload = JSON.parse(atob(session.access_token.split(".")[1]))
+            const expiresAt = payload.exp ? payload.exp * 1000 : Date.now() + 24 * 60 * 60 * 1000 // 24h fallback
+
+            await save("cachedAuth", {
+              user: userFromToken,
+              token: session.access_token,
+              expiresAt,
+            } as CachedAuth)
             return
           }
 
-          // If we have a session token but are offline without cache, trust the token
-          setToken(session.access_token)
-
-          // Attempt to extract user information from the token if possible
-          const payload = JSON.parse(atob(session.access_token.split(".")[1]))
-          if (payload.sub) {
-            const cachedUser = { id: payload.sub, email: payload.email }
-            setUser(cachedUser as User)
-            // Save in cache for future use
-            await save("cachedAuth", {
-              user: cachedUser,
-              token: session.access_token,
-            } as CachedAuth)
-          }
-
-          setAuthStatus("authenticated")
+          setToken(undefined)
+          setUser(null)
+          setAuthStatus("signIn")
           return
         }
 
@@ -150,11 +213,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             // If offline, try to use cached credentials before logging out
             if (!isConnected) {
               const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
-              if (cachedAuth?.user && cachedAuth?.token) {
-                setToken(cachedAuth.token)
-                setUser(cachedAuth.user)
-                setAuthStatus("authenticated")
-                return
+              if (cachedAuth?.user && cachedAuth?.token && cachedAuth.expiresAt > Date.now()) {
+                if (isValidJWTToken(cachedAuth.token)) {
+                  setToken(cachedAuth.token)
+                  setUser(cachedAuth.user)
+                  setAuthStatus("authenticated")
+                  return
+                }
               }
             }
 
@@ -164,8 +229,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             return
           }
 
+          // Calculate expiration time from token
+          const payload = JSON.parse(atob(session.access_token.split(".")[1]))
+          const expiresAt = payload.exp ? payload.exp * 1000 : Date.now() + 24 * 60 * 60 * 1000 // 24h fallback
+
           // Save user and token to local storage for offline use
-          await save("cachedAuth", { user, token: session.access_token } as CachedAuth)
+          await save("cachedAuth", {
+            user,
+            token: session.access_token,
+            expiresAt,
+          } as CachedAuth)
 
           setToken(session.access_token)
           setUser(user)
@@ -174,11 +247,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           // If it's likely a network error and we're offline
           if (!isConnected) {
             const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
-            if (cachedAuth?.user && cachedAuth?.token) {
-              setToken(cachedAuth.token)
-              setUser(cachedAuth.user)
-              setAuthStatus("authenticated")
-              return
+            if (cachedAuth?.user && cachedAuth?.token && cachedAuth.expiresAt > Date.now()) {
+              if (isValidJWTToken(cachedAuth.token)) {
+                setToken(cachedAuth.token)
+                setUser(cachedAuth.user)
+                setAuthStatus("authenticated")
+                return
+              }
             }
           }
 
@@ -191,11 +266,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         // If it's likely a network error and we're offline
         if (!isConnected) {
           const cachedAuth = (await load("cachedAuth")) as CachedAuth | null
-          if (cachedAuth?.user && cachedAuth?.token) {
-            setToken(cachedAuth.token)
-            setUser(cachedAuth.user)
-            setAuthStatus("authenticated")
-            return
+          if (cachedAuth?.user && cachedAuth?.token && cachedAuth.expiresAt > Date.now()) {
+            if (isValidJWTToken(cachedAuth.token)) {
+              setToken(cachedAuth.token)
+              setUser(cachedAuth.user)
+              setAuthStatus("authenticated")
+              return
+            }
           }
         }
 
